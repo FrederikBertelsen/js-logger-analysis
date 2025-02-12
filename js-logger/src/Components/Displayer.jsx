@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import '../css/button.css';
 
 
 const Displayer = () => {
@@ -7,10 +8,15 @@ const Displayer = () => {
         setCounter(counter+1)
     }
     return (
-
-    <>
-      <button className="d-flex flex-column" style={{height: '100vh', width: '200vh'}} onClick = {incrementConter}>{counter}</button>
-    </>
+    <div className='center'>
+      <button className='button' onClick = {incrementConter}>{counter}</button>
+      <form>
+        <div>
+          <input type="text" style={{width: "80vh", height: "10vh", borderRadius: "20px", marginTop: "5vh"}}/>
+          <input className='input-button' type="submit" value="Send" />
+        </div>
+      </form>
+    </div>
     );
 }
 export default Displayer;
