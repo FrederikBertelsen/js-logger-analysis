@@ -1,35 +1,245 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Express Logger Test</title>
+    <title>User Interation Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: #fff;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #0069d9;
+        }
+
+        .inline-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .inline-group label {
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Welcome to the Express Logger Test Website</h1>
-    <button id="send-event">Send Event</button>
+    <h1>User Interation Tracker</h1>
+    <div class="container">
+        <p>Interact with these elements to send events to the server.</p>
+
+        <div class="form-group">
+            <button id="btn-click">Click Me</button>
+        </div>
+
+        <div class="form-group inline-group">
+            <label for="text-input">Text Input:</label>
+            <input type="text" id="text-input" placeholder="Type something...">
+        </div>
+
+        <div class="form-group">
+            <label for="textarea">Textarea:</label>
+            <textarea id="textarea" rows="3" placeholder="Write your comments..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="checkbox" id="checkbox-label">
+                <input type="checkbox" id="checkbox"> Check me!
+            </label>
+        </div>
+
+        <div class="form-group">
+            <p>Radio Buttons:</p>
+            <label>
+                <input type="radio" name="radio-group" value="option1"> Option 1
+            </label>
+            <label>
+                <input type="radio" name="radio-group" value="option2"> Option 2
+            </label>
+            <label>
+                <input type="radio" name="radio-group" value="option3"> Option 3
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label for="select">Select an Option:</label>
+            <select id="select">
+                <option value="">--Choose an option--</option>
+                <option value="item1">Item 1</option>
+                <option value="item2">Item 2</option>
+                <option value="item3">Item 3</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="file-input">Upload a File:</label>
+            <input type="file" id="file-input">
+        </div>
+
+        <div class="form-group">
+            <label for="range-input">Slide to set a value:</label>
+            <input type="range" id="range-input" min="0" max="100" value="50">
+            <span id="range-value">50</span>
+        </div>
+
+        <div class="form-group">
+            <a href="#" id="link">Click this link</a>
+        </div>
+    </div>
 
     <script>
-        // When the button is clicked, send an event to the server.
-        document.getElementById('send-event').addEventListener('click', () => {
+        // Generate a session ID when the page loads
+        const sessionId = sessionStorage.getItem('sessionId') ||
+            Array.from(crypto.getRandomValues(new Uint8Array(16)))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        sessionStorage.setItem('sessionId', sessionId);
+
+        // Helper function to send events to the server.
+        function sendEvent(eventName, details = {}) {
+            const payload = {
+                sessionId: sessionId,
+                event: eventName,
+                time: new Date().toISOString(),
+                details: details
+            };
+            console.log('Sending event:', payload);
             fetch('/api/event', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    event: 'buttonClicked',
-                    time: new Date().toISOString()
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             })
                 .then(response => response.json())
-                .then(data => {
-                    console.log('Server response:', data);
-                })
-                .catch(error => {
-                    console.error('Error sending event:', error);
-                });
+                .then(data => console.log('Server response:', data))
+                .catch(err => console.error('Error sending event:', err));
+        }
+
+        // Send page load event when the page is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            sendEvent('pageLoad', {
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+        });
+
+        // Button click event.
+        document.getElementById('btn-click').addEventListener('click', () => {
+            sendEvent('buttonClicked');
+        });
+
+        // Text input events.
+        const textInput = document.getElementById('text-input');
+        textInput.addEventListener('input', () => {
+            sendEvent('textInputChanged', { value: textInput.value });
+        });
+        textInput.addEventListener('blur', () => {
+            sendEvent('textInputBlur', { value: textInput.value });
+        });
+
+        // Textarea events.
+        const textarea = document.getElementById('textarea');
+        textarea.addEventListener('input', () => {
+            sendEvent('textareaChanged', { value: textarea.value });
+        });
+        textarea.addEventListener('blur', () => {
+            sendEvent('textareaBlur', { value: textarea.value });
+        });
+
+        // Checkbox event.
+        const checkbox = document.getElementById('checkbox');
+        checkbox.addEventListener('change', () => {
+            sendEvent('checkboxToggled', { checked: checkbox.checked });
+        });
+
+        // Radio buttons event.
+        const radios = document.getElementsByName('radio-group');
+        radios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    sendEvent('radioSelected', { value: radio.value });
+                }
+            });
+        });
+
+        // Select dropdown event.
+        const selectEl = document.getElementById('select');
+        selectEl.addEventListener('change', () => {
+            sendEvent('selectChanged', { value: selectEl.value });
+        });
+
+        // File input event.
+        const fileInput = document.getElementById('file-input');
+        fileInput.addEventListener('change', () => {
+            // For security reasons, browsers do not give you the file path.
+            // We can capture file information such as name and size.
+            const files = Array.from(fileInput.files).map(file => ({ name: file.name, size: file.size }));
+            sendEvent('fileSelected', { files: files });
+        });
+
+        // Range (slider) event.
+        const rangeInput = document.getElementById('range-input');
+        const rangeValue = document.getElementById('range-value');
+        rangeInput.addEventListener('input', () => {
+            rangeValue.textContent = rangeInput.value;
+            sendEvent('rangeChanged', { value: rangeInput.value });
+        });
+
+        // Link click event.
+        const link = document.getElementById('link');
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            sendEvent('linkClicked', { href: link.href });
         });
     </script>
 </body>
