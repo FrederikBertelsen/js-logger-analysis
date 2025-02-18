@@ -8,7 +8,7 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({ message: 'Hello world' }));
     }
     else if (req.method === 'GET' && req.url === '/index.html') {
-        fs.readFile('index.html', (err, data) => {
+        fs.readFile('public/index.html', (err, data) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
                 return res.end('Error loading index.html');
