@@ -1,31 +1,13 @@
-const express = require('express')
-const path = require('path')
-const app = express()
-const port = 4000;
+const http = require('http');
 
-// Middleware to parse JSON payloads
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files from the "public" directory.
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Optional: An explicit route for the homepage.
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+const server = http.createServer((req, res) => {
+    if (req.method === 'GET' && req.url === '/') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Hello world' }));
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
 });
 
-// Endpoint to receive events from the client.
-app.post('/api/event', (req, res) => {
-    const eventData = req.body;
-    console.log('Received event data:', eventData);
-
-    // Here, you could integrate your logger library to log the event.
-
-    // Return a response to the client.
-    res.json({ status: 'success', received: eventData });
-});
-
-app.listen(port, () => {
-    console.log(`Server is listening on http://localhost:${port}`);
-});
+server.listen(3000, () => console.log('Server running on port 3000'));
