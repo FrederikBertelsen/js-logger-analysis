@@ -1,15 +1,16 @@
-async function parseJSONFromRequest(req) {
+async function getDataFromRequest(req) {
     let body = '';
     for await (const chunk of req) {
         body += chunk.toString();
     }
     try {
-        return JSON.parse(body);
+        return body;
+        // return JSON.parse(body);
     } catch (error) {
         throw new Error('Invalid JSON');
     }
 }
 
 module.exports = {
-    parseJSONFromRequest
+    getDataFromRequest 
 };
