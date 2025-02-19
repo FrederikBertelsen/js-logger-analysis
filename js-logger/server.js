@@ -1,12 +1,14 @@
 const http = require('http');
 const fs = require('fs');
-const { parseJSONFromRequest } = require('./utils');
+const { getDataFromRequest } = require('./utils');
 
+
+const myLogger = require('./my-logger');
 
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Hello world' }));
+        res.end(JSON.stringify({ message: 'Go to /index.html' }));
     }
     else if (req.method === 'GET' && req.url === '/index.html') {
         fs.readFile('public/index.html', (err, data) => {
@@ -19,11 +21,13 @@ const server = http.createServer((req, res) => {
         });
     }
     else if (req.method === 'POST' && req.url === '/api/event') {
-        parseJSONFromRequest(req).then((json) => {
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(json));
+        getDataFromRequest(req).then((data) => {
+            res.writeHead(200);
+            res.end();
 
-            console.log(json);
+            // console.log(json);
+            myLogger.log(data);
+
         }).catch((error) => {
             res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Invalid JSON');
