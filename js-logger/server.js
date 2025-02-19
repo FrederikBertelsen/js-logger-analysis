@@ -2,8 +2,9 @@ const http = require('http');
 const fs = require('fs');
 const { getDataFromRequest } = require('./utils');
 
-
 const myLogger = require('./my-logger');
+
+const port = process.argv[2] || 4000;
 
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && req.url === '/') {
@@ -39,4 +40,4 @@ const server = http.createServer((req, res) => {
     }
 });
 
-server.listen(4000, () => console.log('Server running on port 4000'));
+server.listen(port, () => console.log(`Server running on port ${port}`));
