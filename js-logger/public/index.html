@@ -83,18 +83,12 @@
         </div>
     </div>
 
+    <script src="js/session-id-manager.js"></script>
     <script>
-        // Generate a session ID when the page loads
-        const sessionId = sessionStorage.getItem('sessionId') ||
-            Array.from(crypto.getRandomValues(new Uint8Array(16)))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('');
-        sessionStorage.setItem('sessionId', sessionId);
-
         // Helper function to send events to the server
         function sendEvent(logLevel = 'info', details = {}) {
             const payload = {
-                sessionId: sessionId,
+                sessionId: window.getSessionId(),
                 time: new Date().toISOString(),
                 ...details
             };
