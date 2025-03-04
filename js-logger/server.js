@@ -55,27 +55,29 @@ const server = http.createServer((req, res) => {
     }
     else if (req.method === 'POST' && req.url === '/api/event') {
         getJsonFromRequest(req).then((json) => {
+            console.log("Event received:", json);
+            logger.log(json.level, json.data);
+
             res.writeHead(200);
             res.end();
-            logger.log(json.level, json.data);
         }).catch((error) => {
+            console.log(error);
+
             res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Invalid JSON');
-            console.log(error);
         });
     }
     else if (req.method === 'POST' && req.url === '/api/switch-logger') {
         getJsonFromRequest(req).then((json) => {
-            res.writeHead(200);
-            res.end();
-
             logger.switchLogger(json.logger, json.options);
             console.log(`\nSwitched logger to ${json.logger} with options:`, json.options, '\n');
 
+            res.writeHead(200);
+            res.end();
         }).catch((error) => {
+            console.log(error);
             res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Invalid JSON');
-            console.log(error);
         });
     }
     // Static file handler for public folder

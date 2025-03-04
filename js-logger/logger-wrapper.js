@@ -354,6 +354,7 @@ class JsnlogLoggerAdapter extends BaseLoggerAdapter {
         }
 
         this.instance = this.jsnlog.JL();
+        // this.instance.level = config.level;
     }
 
     log(level, ...args) {
