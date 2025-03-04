@@ -65,7 +65,7 @@ function setupLoggerSwitching() {
         })
             .then(() => {
                 console.log(`Logger switched to ${loggerType} with level ${logLevel}`);
-                alert(`Logger switched to ${loggerType} with level ${logLevel}`);
+                // alert(`Logger switched to ${loggerType} with level ${logLevel}`);
             })
             .catch(err => console.error('Error switching logger:', err));
     });

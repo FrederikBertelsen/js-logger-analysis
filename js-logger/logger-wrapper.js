@@ -358,7 +358,8 @@ class JsnlogLoggerAdapter extends BaseLoggerAdapter {
 
     log(level, ...args) {
         if (args.length === 1) {
-            this.instance.log(level, args[0]);
+            this.jsnlogNodeJS.jsnlog_nodejs(this.instance, args[0]);
+            // this.instance.log(level, args[0]);
         }
 
         const [message, ...meta] = args;
