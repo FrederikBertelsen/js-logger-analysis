@@ -215,7 +215,7 @@ class ConsoleLoggerAdapter extends BaseLoggerAdapter {
 }
 
 /**
- * My Logger Adapter
+ * MyLogger Adapter
  */
 class MyLoggerAdapter extends BaseLoggerAdapter {
     constructor(options = {}) {
@@ -252,7 +252,7 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
     #createWinstonLogger(options) {
         const config = {
             level: options.level || 'info',
-            ormat: format.combine(
+            format: format.combine(
                 format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }),
@@ -260,7 +260,7 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
                 format.splat(),
                 format.json()
             ),
-            defaultMeta: { service: 'your-service-name' },
+            // defaultMeta: { service: 'your-service-name' },
             transports: [
                 new this.winston.transports.Console({
                     format: format.combine(
@@ -334,9 +334,48 @@ class PinoLoggerAdapter extends BaseLoggerAdapter {
     }
 }
 
+/**
+ * JSNlog Logger Adapter
+ */
+class JsnlogLoggerAdapter extends BaseLoggerAdapter {
+    constructor(options = {}) {
+        super(options);
+        // Import JSNlog only when needed
+        this.jsnlog = require('jsnlog');
+        this.jsnlogNodeJS = require('jsnlog-nodejs');
+
+        const config = {
+            level: options.level || 'info'
+        };
+
+        // Apply custom JSNLog options if provided
+        if (options.jsnlog) {
+            Object.assign(config, options.jsnlog);
+        }
+
+        this.instance = this.jsnlog.JL();
+    }
+
+    log(level, ...args) {
+        if (args.length === 1) {
+            this.instance.log(level, args[0]);
+        }
+
+        const [message, ...meta] = args;
+        return this.instance.log(level, { msg: message, ...meta });
+    }
+
+    cleanup() {
+        this.instance = null;
+        this.jsnlog = null;
+        this.jsnlogNodeJS = null;
+    }
+}
+
 // Register built-in loggers
-LoggerWrapper.registerLogger('my-logger', MyLoggerAdapter);
 LoggerWrapper.registerLogger('console', ConsoleLoggerAdapter);
+LoggerWrapper.registerLogger('my-logger', MyLoggerAdapter);
+LoggerWrapper.registerLogger('jsnlog', JsnlogLoggerAdapter);
 LoggerWrapper.registerLogger('winston', WinstonLoggerAdapter);
 LoggerWrapper.registerLogger('pino', PinoLoggerAdapter);
 
