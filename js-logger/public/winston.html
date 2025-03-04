@@ -134,8 +134,23 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/loglevel/1.8.1/loglevel.min.js"></script>
     <script>
+    const logger = winston.createLogger({
+    level: "info",
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.Http({
+        level: "info",
+        format: winston.format.json(),
+        host: "your-server.com",
+        path: "/logs",
+      }),
+    ],
+  });
 
-        // Generate a session ID when the page loads
+  logger.info("Winston log from the browser!");
+/*        const WinstonLogger = require('./Winston/WinstonLogger')
+        const winstonLogger = new WinstonLogger();
+  */      // Generate a session ID when the page loads
         const sessionId = sessionStorage.getItem('sessionId') ||
             Array.from(crypto.getRandomValues(new Uint8Array(16)))
                 .map(b => b.toString(16).padStart(2, '0'))
@@ -169,8 +184,8 @@
 
         // Button click event.
         document.getElementById('btn-click').addEventListener('click', () => {
-            
-            sendEvent('buttonClicked');
+            //winstonLogger.filesystem.info("heaek")
+            //sendEvent('buttonClicked');
 
         });
 
