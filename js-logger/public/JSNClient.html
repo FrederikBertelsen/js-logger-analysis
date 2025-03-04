@@ -91,7 +91,6 @@
             url: "/api/event",  // Your custom endpoint
             storeInBufferLevel: JL.getDebugLevel(), // Ensures logs are stored
             sendWithBufferLevel: 1000, // Ensures logs are sent immediately
-            sendTimeout: 5000 // Optional: Timeout in milliseconds
         });
 
         // Attach the appender to JSNLog
@@ -109,7 +108,7 @@
                 case "info":
                     logger.info(details)
                     break;
-                case "warning":
+                case "error":
                     logger.error(details);
                     break ;
                 default:
