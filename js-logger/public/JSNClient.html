@@ -84,6 +84,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsnlog/2.30.0/jsnlog.min.js"></script>
+    <script src="js/session-id-manager.js"></script>
     <script>
 
         const ajaxAppender = JL.createAjaxAppender("CustomAppender");
@@ -96,6 +97,9 @@
         // Attach the appender to JSNLog
         JL().setOptions({
             appenders: [ajaxAppender]
+        });
+        JL.setOptions({
+            "requestId": window.getSessionId()
         });
 
         // Create a logger instance
@@ -112,7 +116,7 @@
                     logger.error(details);
                     break ;
                 default:
-                    logger.info("default")
+                    logger.error("Should not reach this point")
             }
         }
 

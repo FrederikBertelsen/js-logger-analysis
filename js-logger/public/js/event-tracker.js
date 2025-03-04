@@ -5,12 +5,6 @@
 
 // Set up all event listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Send page load event
-    sendEvent('pageLoad', {
-        url: window.location.href,
-        userAgent: navigator.userAgent
-    });
-
     setupButtonClickEvents();
     setupTextInputEvents();
     setupCheckboxEvents();
