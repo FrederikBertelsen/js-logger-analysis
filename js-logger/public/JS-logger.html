@@ -90,10 +90,8 @@
         Logger.setHandler(function (messages, context) {
 
             const payload = {
-                level: context.level.name,  // "INFO", "WARN", "ERROR", etc.
-                message: messages,
-                timestamp: new Date().toISOString(),
-                source: 'client', // Optional metadata
+                level: context.level,
+                data: messages
             };
 
             // Send logs to the server
