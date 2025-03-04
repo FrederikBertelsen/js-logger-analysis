@@ -10,6 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "jsnlog": "^2.30.0",
+    "jsnlog-nodejs": "^2.30.0",
     "pino": "^9.6.0",
     "winston": "^3.17.0"
   }

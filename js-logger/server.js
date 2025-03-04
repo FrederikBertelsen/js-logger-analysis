@@ -68,7 +68,10 @@ const server = http.createServer((req, res) => {
         getJsonFromRequest(req).then((json) => {
             res.writeHead(200);
             res.end();
+
             logger.switchLogger(json.logger, json.options);
+            console.log(`\nSwitched logger to ${json.logger} with options:`, json.options, '\n');
+
         }).catch((error) => {
             res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Invalid JSON');
