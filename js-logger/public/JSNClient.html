@@ -3,79 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>User Interation Tracker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 2rem;
-            background: #f9f9f9;
-            color: #333;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.3rem;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 0.5rem;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            padding: 0.6rem 1.2rem;
-            font-size: 1rem;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            background-color: #007BFF;
-            color: #fff;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background-color: #0069d9;
-        }
-
-        .inline-group {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .inline-group label {
-            margin: 0;
-        }
-    </style>
+    <title>User Interaction Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-    <h1>User Interation Tracker</h1>
+    <div class="logger-controls">
+        <div class="inline-group">
+            <label for="logger-type">Logger:</label>
+            <select id="logger-type">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+        <div class="inline-group">
+            <label for="log-level">Level:</label>
+            <select id="log-level">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+        <button id="set-logger">Apply</button>
+    </div>
+
+    <h1>User Interaction Tracker</h1>
+
     <div class="container">
         <p>Interact with these elements to send events to the server.</p>
 
@@ -132,103 +82,45 @@
             <a href="#" id="link">Click this link</a>
         </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsnlog/2.30.0/jsnlog.min.js"></script>
     <script>
 
-        const Logger = JL
+        const ajaxAppender = JL.createAjaxAppender("CustomAppender");
+        ajaxAppender.setOptions({
+            url: "/api/event",  // Your custom endpoint
+            storeInBufferLevel: JL.getDebugLevel(), // Ensures logs are stored
+            sendWithBufferLevel: 1000, // Ensures logs are sent immediately
+            sendTimeout: 5000 // Optional: Timeout in milliseconds
+        });
+
+        // Attach the appender to JSNLog
+        JL().setOptions({
+            appenders: [ajaxAppender]
+        });
+
+        // Create a logger instance
+        const logger = JL("ClientLogger");
      // Generate a session ID when the page loads
-        const sessionId = sessionStorage.getItem('sessionId') ||
-            Array.from(crypto.getRandomValues(new Uint8Array(16)))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('');
-        sessionStorage.setItem('sessionId', sessionId);
 
         // Helper function to send events to the server.
-        function sendEvent(eventName, details = {}) {
-            const payload = {
-                sessionId: sessionId,
-                event: eventName,
-                time: new Date().toISOString(),
-                details: details
-            };
-            console.log('Sending event:', payload);
-            fetch('/api/event', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .catch(err => console.error('Error sending event:', err));
+        function sendEvent(loglevel, details = {}) {
+            switch (loglevel){
+                case "info":
+                    logger.info(details)
+                    break;
+                case "warning":
+                    logger.error(details);
+                    break ;
+                default:
+                    logger.info("default")
+            }
         }
 
-        // Send page load event when the page is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            sendEvent('pageLoad', {
-                url: window.location.href,
-                userAgent: navigator.userAgent
-            });
-        });
 
-        // Button click event.
-        document.getElementById('btn-click').addEventListener('click', () => {
-            sendEvent('buttonClicked');
-
-        });
-
-        // Text input events.
-        const textInput = document.getElementById('text-input');
-        textInput.addEventListener('input', () => {
-            sendEvent('textInputChanged', { value: textInput.value });
-        });
-        textInput.addEventListener('blur', () => {
-            sendEvent('textInputBlur', { value: textInput.value });
-        });
-
-        // Checkbox event.
-        const checkbox = document.getElementById('checkbox');
-        checkbox.addEventListener('change', () => {
-            sendEvent('checkboxToggled', { checked: checkbox.checked });
-        });
-
-        // Radio buttons event.
-        const radios = document.getElementsByName('radio-group');
-        radios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                if (radio.checked) {
-                    sendEvent('radioSelected', { value: radio.value });
-                }
-            });
-        });
-
-        // Select dropdown event.
-        const selectEl = document.getElementById('select');
-        selectEl.addEventListener('change', () => {
-            sendEvent('selectChanged', { value: selectEl.value });
-        });
-
-        // File input event.
-        const fileInput = document.getElementById('file-input');
-        fileInput.addEventListener('change', () => {
-            // For security reasons, browsers do not give you the file path.
-            // We can capture file information such as name and size.
-            const files = Array.from(fileInput.files).map(file => ({ name: file.name, size: file.size }));
-            sendEvent('fileSelected', { files: files });
-        });
-
-        // Range (slider) event.
-        const rangeInput = document.getElementById('range-input');
-        const rangeValue = document.getElementById('range-value');
-        rangeInput.addEventListener('input', () => {
-            rangeValue.textContent = rangeInput.value;
-            sendEvent('rangeChanged', { value: rangeInput.value });
-        });
-
-        // Link click event.
-        const link = document.getElementById('link');
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            sendEvent('linkClicked', { href: link.href });
-        });
     </script>
+    <script src="js/logger-controls.js"></script>
+    <script src="js/event-tracker.js"></script>
 </body>
 
 </html>
