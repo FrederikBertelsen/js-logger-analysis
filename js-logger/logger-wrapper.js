@@ -353,18 +353,12 @@ class JsnlogLoggerAdapter extends BaseLoggerAdapter {
             Object.assign(config, options.jsnlog);
         }
 
-        this.instance = this.jsnlog.JL();
+        this.instance = this.jsnlog.JL;
         // this.instance.level = config.level;
     }
 
-    log(level, ...args) {
-        if (args.length === 1) {
-            this.jsnlogNodeJS.jsnlog_nodejs(this.instance, args[0]);
-            // this.instance.log(level, args[0]);
-        }
-
-        const [message, ...meta] = args;
-        return this.instance.log(level, { msg: message, ...meta });
+    log(json) {
+        return this.jsnlogNodeJS.jsnlog_nodejs(this.instance, json);
     }
 
     cleanup() {

@@ -55,14 +55,18 @@ const server = http.createServer((req, res) => {
     }
     else if (req.method === 'POST' && req.url === '/api/event') {
         getJsonFromRequest(req).then((json) => {
-            console.log("Event received:", json);
-            logger.log(json.level, json.data);
+            console.log("\nRaw JSON received:\n", json, "\n");
+
+            if (json.level && json.data) {
+                logger.log(json.level, json.data);
+            } else {
+                logger.log(json);
+            }
 
             res.writeHead(200);
             res.end();
         }).catch((error) => {
-            console.log(error);
-
+            console.log("Error happend: ", error);
             res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Invalid JSON');
         });
@@ -75,7 +79,7 @@ const server = http.createServer((req, res) => {
             res.writeHead(200);
             res.end();
         }).catch((error) => {
-            console.log(error);
+            console.log("Error happend: ", error);
             res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Invalid JSON');
         });

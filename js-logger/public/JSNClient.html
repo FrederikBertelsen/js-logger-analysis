@@ -104,24 +104,22 @@
 
         // Create a logger instance
         const logger = JL("ClientLogger");
-     // Generate a session ID when the page loads
 
         // Helper function to send events to the server.
         function sendEvent(loglevel, details = {}) {
-            switch (loglevel){
+            switch (loglevel) {
                 case "info":
                     logger.info(details)
                     break;
                 case "error":
                     logger.error(details);
-                    break ;
+                    break;
                 default:
                     logger.error("Should not reach this point")
             }
         }
-
-
     </script>
+
     <script src="js/logger-controls.js"></script>
     <script src="js/event-tracker.js"></script>
 </body>
