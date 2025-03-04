@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 2rem;
+    background: #f9f9f9;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #007BFF;
+    color: #fff;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #0069d9;
+}
+
+.inline-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.inline-group label {
+    margin: 0;
+}
+
+.logger-controls {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+}
+
+.logger-controls select {
+    width: auto;
+}
+
+.logger-controls label {
+    margin: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .logger-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

@@ -4,13 +4,13 @@ async function getDataFromRequest(req) {
         body += chunk.toString();
     }
     try {
-        return body;
-        // return JSON.parse(body);
+        // return body;
+        return JSON.parse(body);
     } catch (error) {
         throw new Error('Invalid JSON');
     }
 }
 
 module.exports = {
-    getDataFromRequest 
+    getDataFromRequest
 };

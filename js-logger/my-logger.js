@@ -2,11 +2,11 @@ const fs = require('fs/promises');
 const path = require('path');
 
 class MyLogger {
-    constructor(logDir = 'logs') {
+    constructor(logDir = 'logs/my-logger') {
         this.logDir = logDir;
     }
 
-    async log(data) {
+    async log(level, data) {
         try {
             // Create logs directory if it doesn't exist
             await fs.mkdir(this.logDir, { recursive: true });
