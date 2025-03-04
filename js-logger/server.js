@@ -24,7 +24,7 @@ const MIME_TYPES = {
 const serveStaticFile = (res, filePath) => {
     const extname = path.extname(filePath);
     const contentType = MIME_TYPES[extname] || 'text/plain';
-    
+
     fs.readFile(filePath, (err, data) => {
         if (err) {
             if (err.code === 'ENOENT') {
@@ -44,7 +44,7 @@ const serveStaticFile = (res, filePath) => {
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Go to /index.html' }));
+        res.end(JSON.stringify({ message: 'Go to a page! For example /index.html' }));
     }
     else if (req.method === 'GET' && req.url === '/logger-types') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -52,9 +52,6 @@ const server = http.createServer((req, res) => {
             loggers: LoggerWrapper.registeredLoggerNames,
             levels: LoggerWrapper.LOG_LEVELS
         }));
-    }
-    else if (req.method === 'GET' && req.url === '/index.html') {
-        serveStaticFile(res, 'public/index.html');
     }
     else if (req.method === 'POST' && req.url === '/api/event') {
         getJsonFromRequest(req).then((json) => {
@@ -82,17 +79,17 @@ const server = http.createServer((req, res) => {
     else if (req.method === 'GET') {
         // Remove any query parameters
         const url = req.url.split('?')[0];
-        
+
         // Security check to prevent directory traversal
         if (url.includes('..')) {
             res.writeHead(403, { 'Content-Type': 'text/plain' });
             res.end('Forbidden');
             return;
         }
-        
+
         // Map URL to file path (remove leading slash)
         const filePath = path.join('public', url.replace(/^\//, ''));
-        
+
         serveStaticFile(res, filePath);
     }
     else {
