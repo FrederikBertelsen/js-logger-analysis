@@ -37,8 +37,10 @@
         const logger = JL("ClientLogger");
 
         // Helper function to send events to the server.
-        function sendEvent(loglevel, details = {}) {
-            switch (loglevel) {
+        function sendEvent(level = 'info', details = {}) {
+            console.log('Sending', level, 'log:', details);
+
+            switch (level) {
                 case "info":
                     logger.info(details)
                     break;
@@ -46,7 +48,7 @@
                     logger.error(details);
                     break;
                 default:
-                    logger.error("Should not reach this point")
+                Logger.error('level', level, 'is not added to the switch case...');
             }
         }
     </script>
