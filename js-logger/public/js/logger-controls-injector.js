@@ -4,12 +4,12 @@
  * and switching between loggers
  */
 
-// Fetch available logger types and levels when page loads
-document.addEventListener('DOMContentLoaded', () => {
+// Create and set up the logger controls immediately
+(function () {
     createLoggerControlsUI();
     loadLoggerOptions();
     setupLoggerSwitching();
-});
+})();
 
 /**
  * Creates and inserts the logger controls UI into the DOM
