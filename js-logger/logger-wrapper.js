@@ -1,5 +1,4 @@
 'use strict';
-
 /**
  * Logger Wrapper - A class to manage different logger implementations
  * allowing easy switching between logger types with proper cleanup.
@@ -250,26 +249,26 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
     }
 
     #createWinstonLogger(options) {
+        const myFormat = this.winston.format.printf(({ level, ...data }) => {
+            return `Level: ${level}; Data: ${data? JSON.stringify(data) : ''}`;
+          });
         const config = {
             level: options.level || 'info',
-            format: format.combine(
-                format.timestamp({
+            format: this.winston.format.combine(
+                this.winston.format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }),
-                format.errors({ stack: true }),
-                format.splat(),
-                format.json()
+                this.winston.format.errors({ stack: true }),
+                this.winston.format.colorize(),
+                this.winston.format.splat(),
+                
+
             ),
             // defaultMeta: { service: 'your-service-name' },
             transports: [
-                new this.winston.transports.Console({
-                    format: format.combine(
-                        format.colorize(),
-                        format.simple()
-                    )
-                }),
-                new winston.transports.File({ filename: 'error.log', level: 'error' }),
-                new winston.transports.File({ filename: 'logs/winston/combined.log' }),
+                new this.winston.transports.Console({format: myFormat}),
+                new this.winston.transports.File({ filename: 'error.log', level: 'error' }),
+                new this.winston.transports.File({ filename: 'logs/winston/combined.log' }),
             ]
         };
 

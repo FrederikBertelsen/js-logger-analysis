@@ -58,7 +58,7 @@ const server = http.createServer((req, res) => {
             console.log("\nRaw JSON received:\n", json, "\n");
 
             if (json.level && json.data) {
-                logger.log(json.level, json.data);
+                logger.log(json.level.toLowerCase(), json.data);
             } else {
                 logger.log(json);
             }
