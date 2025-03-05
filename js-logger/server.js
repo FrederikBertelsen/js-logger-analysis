@@ -55,7 +55,7 @@ const server = http.createServer((req, res) => {
     }
     else if (req.method === 'POST' && req.url === '/api/event') {
         utils.getJsonOrStringFromRequest(req).then((json) => {
-            console.log("\nRaw data received:\n", json);
+            console.log("Raw data received:", json);
 
             const processLogEntry = (log) => {
                 if (log.level) {
