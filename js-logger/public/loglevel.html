@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Interaction Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <script src="js/event-elements-injector.js"></script>
+
+    <script src="js/logger-controls-injector.js"></script>
+    <script src="js/page-links-injector.js"></script>
+    <script src="js/session-id-manager.js"></script>
+    <script src="js/event-tracker.js"></script>
+
+    <script src="https://unpkg.com/loglevel@1.9.2/dist/loglevel.min.js"></script>
+    <script src="https://unpkg.com/loglevel-plugin-remote@^0.6/dist/loglevel-plugin-remote.min.js"></script>
+
+    <script>
+        // loglevel-plugin-remote options
+        const options = {
+            url: '/api/event',
+            method: 'POST',
+            headers: {},
+            token: '',
+            onUnauthorized: failedToken => { },
+            timeout: 0,
+            interval: 1000,
+            level: 'trace',
+            backoff: {
+                multiplier: 2,
+                jitter: 0.1,
+                limit: 30000,
+            },
+            capacity: 500,
+            stacktrace: {
+                levels: ['trace', 'warn', 'error', 'info'],
+                depth: 3,
+                excess: 0,
+            },
+            timestamp: () => new Date().toISOString(),
+            format: remote.json,
+        };
+
+        // add the remote plugin to loglevel
+        remote.apply(log, options)
+
+        // set logger name and enable all log levels
+        let logger = log.getLogger('LogLevel-Remote');
+        logger.enableAll();
+
+        // Helper function to send events to the server.
+        function sendEvent(level = 'info', details = {}) {
+            console.log('Sending', level, 'log:', details);
+
+            details = JSON.stringify(details);
+
+            switch (level) {
+                case "info":
+                    logger.info(details)
+                    break;
+                case "error":
+                    logger.error(details);
+                    break;
+                default:
+                    logger.error('logLevel', level, 'is not added to the switch case...');
+            }
+        }
+    </script>
+</body>
+
+</html>

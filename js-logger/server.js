@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const LoggerWrapper = require('./logger-wrapper');
-const { getDataFromRequest: getJsonFromRequest } = require('./utils');
+const utils = require('./utils');
 
 const logger = new LoggerWrapper('console', { level: 'info' });
 const port = process.argv[2] || 4000;
@@ -54,8 +54,18 @@ const server = http.createServer((req, res) => {
         }));
     }
     else if (req.method === 'POST' && req.url === '/api/event') {
-        getJsonFromRequest(req).then((json) => {
-            console.log("\nRaw JSON received:\n", json, "\n");
+        utils.getJsonOrStringFromRequest(req).then((json) => {
+            console.log("\nRaw data received:\n", json);
+
+            if (json.logs){
+                json.logs.forEach(log => {
+                    if (log.level && log.data) {
+                        logger.log(log.level.toLowerCase(), log.data);
+                    } else {
+                        logger.log(log);
+                    }
+                });
+            }
 
             if (json.level && json.data) {
                 logger.log(json.level.toLowerCase(), json.data);
@@ -72,7 +82,7 @@ const server = http.createServer((req, res) => {
         });
     }
     else if (req.method === 'POST' && req.url === '/api/switch-logger') {
-        getJsonFromRequest(req).then((json) => {
+        utils.getJsonOrStringFromRequest(req).then((json) => {
             logger.switchLogger(json.logger, json.options);
             console.log(`\nSwitched logger to ${json.logger} with options:`, json.options, '\n');
 
