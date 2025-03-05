@@ -13,7 +13,7 @@
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
 
     // Create navigation HTML
-    let navLinks = '';
+    let navLinks = '<p>Client Logger</p>';
     htmlPages.forEach(page => {
         const isActive = currentPath === page.path ? 'active-link' : '';
         navLinks += `<button onclick="window.location.href='/${page.path}'" class="${isActive}">${page.name}</button>`;
