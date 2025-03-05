@@ -57,21 +57,23 @@ const server = http.createServer((req, res) => {
         utils.getJsonOrStringFromRequest(req).then((json) => {
             console.log("\nRaw data received:\n", json);
 
-            if (json.logs){
-                json.logs.forEach(log => {
-                    if (log.level && log.data) {
-                        logger.log(log.level.toLowerCase(), log.data);
-                    } else {
-                        logger.log(log);
-                    }
-                });
+            const processLogEntry = (log) => {
+                if (log.level) {
+                    const level = log.level;
+                    delete log.level;
+
+                    logger.log(level.toLowerCase(), log);
+                } else {
+                    logger.log(log);
+                }
+            };
+
+            if (json.logs) {
+                json.logs.forEach(processLogEntry);
+            } else {
+                processLogEntry(json);
             }
 
-            if (json.level && json.data) {
-                logger.log(json.level.toLowerCase(), json.data);
-            } else {
-                logger.log(json);
-            }
 
             res.writeHead(200);
             res.end();

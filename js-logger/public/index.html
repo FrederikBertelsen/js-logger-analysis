@@ -23,6 +23,7 @@
             const payload = {
                 sessionId: window.getSessionId(),
                 time: new Date().toISOString(),
+                level: level,
                 ...details
             };
 
@@ -31,7 +32,7 @@
             fetch('/api/event', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ level: level, data: payload })
+                body: JSON.stringify(payload)
             })
                 .catch(err => console.error('Error sending event:', err));
         }
