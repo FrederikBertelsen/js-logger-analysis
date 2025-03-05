@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Interaction Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <script src="js/event-elements-injector.js"></script>
+
+    <script src="js/logger-controls-injector.js"></script>
+    <script src="js/page-links-injector.js"></script>
+    <script src="js/session-id-manager.js"></script>
+    <script src="js/event-tracker.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsnlog/2.30.0/jsnlog.min.js"></script>
+
+    <script>
+        const ajaxAppender = JL.createAjaxAppender("CustomAppender");
+        ajaxAppender.setOptions({
+            url: "/api/event",  // Your custom endpoint
+            storeInBufferLevel: JL.getDebugLevel(), // Ensures logs are stored
+            sendWithBufferLevel: 1000, // Ensures logs are sent immediately
+        });
+
+        // Attach the appender to JSNLog
+        JL().setOptions({
+            appenders: [ajaxAppender]
+        });
+        JL.setOptions({
+            "requestId": window.getSessionId()
+        });
+
+        // Create a logger instance
+        const logger = JL("ClientLogger");
+
+        // Helper function to send events to the server.
+        function sendEvent(loglevel, details = {}) {
+            switch (loglevel) {
+                case "info":
+                    logger.info(details)
+                    break;
+                case "error":
+                    logger.error(details);
+                    break;
+                default:
+                    logger.error("Should not reach this point")
+            }
+        }
+    </script>
+</body>
+
+</html>

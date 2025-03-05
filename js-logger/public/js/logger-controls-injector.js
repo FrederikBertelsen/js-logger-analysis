@@ -6,9 +6,39 @@
 
 // Fetch available logger types and levels when page loads
 document.addEventListener('DOMContentLoaded', () => {
+    createLoggerControlsUI();
     loadLoggerOptions();
     setupLoggerSwitching();
 });
+
+/**
+ * Creates and inserts the logger controls UI into the DOM
+ */
+function createLoggerControlsUI() {
+    // Create the container element
+    const container = document.createElement('div');
+    container.className = 'logger-controls';
+
+    // Create HTML structure for controls
+    container.innerHTML = `
+        <div class="inline-group">
+            <label for="logger-type">Logger:</label>
+            <select id="logger-type">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+        <div class="inline-group">
+            <label for="log-level">Level:</label>
+            <select id="log-level">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+        <button id="set-logger">Apply</button>
+    `;
+
+    // Insert at the beginning of the body or another appropriate location
+    document.body.prepend(container);
+}
 
 function loadLoggerOptions() {
     fetch('/logger-types')

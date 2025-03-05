@@ -76,23 +76,66 @@ button:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 12px;
-    max-width: 100%;
+    width: 250px;
+    /* Increased width to accommodate inline labels */
+}
+
+.logger-controls .inline-group {
+    display: flex;
+    flex-direction: row;
+    /* Changed back to row for inline labels */
+    align-items: center;
+    /* Center items vertically */
+    gap: 8px;
+    /* Space between label and select */
+    width: 100%;
 }
 
 .logger-controls select {
-    width: auto;
+    flex: 1;
+    /* Allow select to take remaining space */
+    min-width: 0;
+    /* Prevent select from overflowing */
+}
+
+.logger-controls button {
+    width: 100%;
+    margin-top: 4px;
 }
 
 .logger-controls label {
+    min-width: 50px;
+    /* Ensure consistent label width */
     margin: 0;
     white-space: nowrap;
 }
 
-@media (max-width: 600px) {
-    .logger-controls {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+.page-navigation {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    /* Change this line */
+    gap: 8px;
+    /* Adjust gap for vertical spacing */
+}
+
+.page-navigation button {
+    width: 100%;
+    /* Make buttons fill the container width */
+    text-align: left;
+    /* Optional: align text to the left */
+}
+
+.active-link {
+    background-color: #0069d9 !important;
 }
