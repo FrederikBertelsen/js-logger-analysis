@@ -53,6 +53,13 @@ const server = http.createServer((req, res) => {
             levels: LoggerWrapper.LOG_LEVELS
         }));
     }
+    else if (req.method === 'GET' && req.url === '/current-logger') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            logger: logger.getLoggerType(), // Use getLoggerType() instead of activeLogger
+            level: logger.options.level
+        }));
+    }
     else if (req.method === 'POST' && req.url === '/api/event') {
         utils.getJsonOrStringFromRequest(req).then((json) => {
             console.log("Raw data received:", json);
@@ -74,7 +81,6 @@ const server = http.createServer((req, res) => {
                 processLogEntry(json);
             }
 
-
             res.writeHead(200);
             res.end();
         }).catch((error) => {
@@ -85,8 +91,9 @@ const server = http.createServer((req, res) => {
     }
     else if (req.method === 'POST' && req.url === '/api/switch-logger') {
         utils.getJsonOrStringFromRequest(req).then((json) => {
-            logger.switchLogger(json.logger, json.options);
             console.log(`\nSwitched logger to ${json.logger} with options:`, json.options, '\n');
+
+            logger.switchLogger(json.logger, json.options);
 
             res.writeHead(200);
             res.end();

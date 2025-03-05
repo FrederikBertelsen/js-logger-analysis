@@ -368,10 +368,10 @@ class JsnlogLoggerAdapter extends BaseLoggerAdapter {
 }
 
 // Register built-in loggers
-LoggerWrapper.registerLogger('console', ConsoleLoggerAdapter);
-LoggerWrapper.registerLogger('my-logger', MyLoggerAdapter);
-LoggerWrapper.registerLogger('jsnlog', JsnlogLoggerAdapter);
-LoggerWrapper.registerLogger('winston', WinstonLoggerAdapter);
-LoggerWrapper.registerLogger('pino', PinoLoggerAdapter);
+LoggerWrapper.registerLogger('Console', ConsoleLoggerAdapter);
+LoggerWrapper.registerLogger('MyLogger', MyLoggerAdapter);
+LoggerWrapper.registerLogger('JSNLog', JsnlogLoggerAdapter);
+LoggerWrapper.registerLogger('Winston', WinstonLoggerAdapter);
+LoggerWrapper.registerLogger('Pino', PinoLoggerAdapter);
 
 module.exports = LoggerWrapper;

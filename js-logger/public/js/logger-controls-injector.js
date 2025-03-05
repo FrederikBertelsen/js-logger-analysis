@@ -4,6 +4,12 @@
  * and switching between loggers
  */
 
+// Store the current logger information globally
+let currentLoggerInfo = {
+    logger: null,
+    level: null
+};
+
 // Create and set up the logger controls immediately
 (function () {
     createLoggerControlsUI();
@@ -43,6 +49,7 @@ function createLoggerControlsUI() {
 }
 
 function loadLoggerOptions() {
+    // First fetch all available loggers and levels
     fetch('/logger-types')
         .then(response => response.json())
         .then(data => {
@@ -69,11 +76,28 @@ function loadLoggerOptions() {
                 levelSelector.appendChild(option);
             });
 
-            // Select the default values
-            loggerSelector.value = 'console';
-            levelSelector.value = 'info';
+            // After populating options, fetch and set current logger settings
+            fetchCurrentLoggerSettings();
         })
         .catch(err => console.error('Error fetching logger types:', err));
+}
+
+function fetchCurrentLoggerSettings() {
+    fetch('/current-logger')
+        .then(response => response.json())
+        .then(data => {
+            // Set the dropdowns to match the current server settings
+            const loggerSelector = document.getElementById('logger-type');
+            const levelSelector = document.getElementById('log-level');
+
+            loggerSelector.value = data.logger;
+            levelSelector.value = data.level;
+
+            // Store the current logger info globally
+            currentLoggerInfo.logger = data.logger;
+            currentLoggerInfo.level = data.level;
+        })
+        .catch(err => console.error('Error fetching current logger settings:', err));
 }
 
 function setupLoggerSwitching() {
@@ -96,9 +120,33 @@ function setupLoggerSwitching() {
             })
         })
             .then(() => {
+                // Update the current logger info
+                currentLoggerInfo.logger = loggerType;
+                currentLoggerInfo.level = logLevel;
+
                 console.log(`Logger switched to ${loggerType} with level ${logLevel}`);
                 // alert(`Logger switched to ${loggerType} with level ${logLevel}`);
             })
             .catch(err => console.error('Error switching logger:', err));
     });
 }
+
+/**
+ * Returns the string name of the currently selected logger in lowercase
+ * @returns {string|null} The current logger type (e.g., "pino", "winston", "console")
+ */
+function getCurrentLoggerType() {
+    return currentLoggerInfo.logger;
+}
+
+/**
+ * Returns the current log level
+ * @returns {string|null} The current log level (e.g., "info", "debug", "error")
+ */
+function getCurrentLogLevel() {
+    return currentLoggerInfo.level;
+}
+
+// Make these functions available globally if needed
+window.getCurrentLoggerType = getCurrentLoggerType;
+window.getCurrentLogLevel = getCurrentLogLevel;
