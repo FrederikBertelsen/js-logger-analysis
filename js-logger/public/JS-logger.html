@@ -36,8 +36,10 @@
         });
 
         // Helper function to send events to the server.
-        function sendEvent(loglevel, details = {}) {
-            switch (loglevel) {
+        function sendEvent(level = 'info', details = {}) {
+            console.log('Sending', logLevel, 'log:', details);
+
+            switch (level) {
                 case "info":
                     Logger.info(details)
                     break;
@@ -45,7 +47,7 @@
                     Logger.error(details);
                     break;
                 default:
-                    Logger.error("Should not reach this point")
+                    Logger.error('logLevel', logLevel, 'is not added to the switch case...');
             }
         }
     </script>

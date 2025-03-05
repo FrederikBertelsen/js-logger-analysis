@@ -18,17 +18,20 @@
 
     <script>
         // Helper function to send events to the server
-        function sendEvent(logLevel = 'info', details = {}) {
+        function sendEvent(level = 'info', details = {}) {
+
             const payload = {
                 sessionId: window.getSessionId(),
                 time: new Date().toISOString(),
                 ...details
             };
-            console.log('Sending event:', payload);
+
+            console.log('Sending', level, 'log:', details);
+
             fetch('/api/event', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ level: logLevel, data: payload })
+                body: JSON.stringify({ level: level, data: payload })
             })
                 .catch(err => console.error('Error sending event:', err));
         }
