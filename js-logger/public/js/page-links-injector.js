@@ -19,11 +19,12 @@
         navLinks += `<button onclick="window.location.href='/${page.path}'" class="${isActive}">${page.name}</button>`;
     });
 
-    // Create the HTML with existing CSS classes
-    const navHTML = `
-    <div class="page-navigation inline-group">${navLinks}</div>
-    `;
+    // Create the navigation element directly
+    const navElement = document.createElement('div');
+    navElement.className = 'page-navigation inline-group';
+    navElement.innerHTML = navLinks;
 
-    // Inject the navigation HTML
-    document.write(navHTML);
+    // Insert as the first element in the body
+    // This ensures the navigation appears at the top of the page
+    document.body.prepend(navElement);
 })();

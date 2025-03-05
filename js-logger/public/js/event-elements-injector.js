@@ -60,6 +60,12 @@
         </div>
     </div>`;
 
-    // Inject the HTML content where the script is placed
-    document.write(formElementsHTML);
+    // Create a container element
+    const container = document.createElement('div');
+
+    // Set its HTML content
+    container.innerHTML = formElementsHTML;
+
+    // Insert the content into the page
+    document.body.appendChild(container);
 })();
