@@ -220,8 +220,8 @@ class MyLoggerAdapter extends BaseLoggerAdapter {
     constructor(options = {}) {
         super(options);
         // Import myLogger only when needed
-        this.myLogger = require('./my-logger');
-        this.instance = this.myLogger(options.logDir ?? "logs/my-logger");
+        const myLogger = require('./my-logger');
+        this.instance = new myLogger(options.logDir ?? "logs/my-logger");
     }
 
     log(level, ...args) {

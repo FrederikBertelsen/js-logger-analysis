@@ -29,4 +29,4 @@ class MyLogger {
     }
 }
 
-module.exports = new MyLogger();
+module.exports = MyLogger;
