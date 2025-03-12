@@ -27,7 +27,7 @@ function createLoggerControlsUI() {
 
     // Create HTML structure for controls
     container.innerHTML = `
-        <p>Backend Logger</p>
+        <p>Server Logger</p>
 
         <div class="inline-group">
             <label for="logger-type">Logger:</label>
