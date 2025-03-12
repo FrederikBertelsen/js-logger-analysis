@@ -6,6 +6,7 @@
         { name: 'js-Logger', path: 'js-logger.html' },
         { name: 'JSNLog', path: 'jsnlog.html' },
         { name: 'LogLevel', path: 'loglevel.html' },
+        { name: 'tslog', path: 'tslog.html' },
         // Add more pages as needed
     ];
 
