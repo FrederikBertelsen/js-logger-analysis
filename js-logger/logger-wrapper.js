@@ -259,7 +259,6 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }),
                 this.winston.format.errors({ stack: true }),
-                this.winston.format.colorize(),
                 this.winston.format.splat(),
                 
 
@@ -267,8 +266,8 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
             // defaultMeta: { service: 'your-service-name' },
             transports: [
                 new this.winston.transports.Console({format: myFormat}),
-                new this.winston.transports.File({ filename: 'error.log', level: 'error' }),
-                new this.winston.transports.File({ filename: 'logs/winston/combined.log' }),
+                new this.winston.transports.File({ filename: 'error.log', level: 'error', format: myFormat}),
+                new this.winston.transports.File({ filename: 'logs/winston/combined.log', format: myFormat}),
             ]
         };
 
@@ -303,16 +302,17 @@ class PinoLoggerAdapter extends BaseLoggerAdapter {
         // Import pino only when needed
         this.pino = require('pino');
 
-        const config = {
+        const config = { 
             level: options.level || 'info'
         };
 
+        const destination = this.pino.destination(options.logFile || './logs/pino/pino.log');
         // Apply custom pino options if provided
         if (options.pino) {
             Object.assign(config, options.pino);
         }
 
-        this.instance = this.pino(config);
+        this.instance = this.pino(config, destination);
     }
 
     log(level, ...args) {

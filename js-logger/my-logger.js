@@ -19,7 +19,7 @@ class MyLogger {
             // Convert input to minified JSON string if it's an object
             const logEntry = typeof data === 'string'
                 ? data.trim()
-                : JSON.stringify(data, null, 0);
+                : JSON.stringify(level, null, 0)+JSON.stringify(data, null, 0);
 
             // Append to file with newline
             await fs.appendFile(filepath, logEntry + '\n');
