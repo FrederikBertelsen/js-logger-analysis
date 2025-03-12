@@ -250,8 +250,8 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
 
     #createWinstonLogger(options) {
         const myFormat = this.winston.format.printf(({ level, ...data }) => {
-            return `Level: ${level}; Data: ${data? JSON.stringify(data) : ''}`;
-          });
+            return `Level: ${level}; Data: ${data ? JSON.stringify(data) : ''}`;
+        });
         const config = {
             level: options.level || 'info',
             format: this.winston.format.combine(
@@ -260,14 +260,14 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
                 }),
                 this.winston.format.errors({ stack: true }),
                 this.winston.format.splat(),
-                
+
 
             ),
             // defaultMeta: { service: 'your-service-name' },
             transports: [
-                new this.winston.transports.Console({format: myFormat}),
-                new this.winston.transports.File({ filename: 'error.log', level: 'error', format: myFormat}),
-                new this.winston.transports.File({ filename: 'logs/winston/combined.log', format: myFormat}),
+                new this.winston.transports.Console({ format: myFormat }),
+                new this.winston.transports.File({ filename: 'error.log', level: 'error', format: myFormat }),
+                new this.winston.transports.File({ filename: 'logs/winston/combined.log', format: myFormat }),
             ]
         };
 
@@ -302,7 +302,7 @@ class PinoLoggerAdapter extends BaseLoggerAdapter {
         // Import pino only when needed
         this.pino = require('pino');
 
-        const config = { 
+        const config = {
             level: options.level || 'info'
         };
 
@@ -367,11 +367,62 @@ class JsnlogLoggerAdapter extends BaseLoggerAdapter {
     }
 }
 
+/**
+ * tslog Logger Adapter
+ */
+class tslogLoggerAdapter extends BaseLoggerAdapter {
+    constructor(options = {}) {
+        super(options);
+        // Import pino only when needed
+        this.tslog = require('tslog');
+        this.appendFileSync = require('fs').appendFileSync;
+
+        const config = {
+            level: options.level || 'info'
+        };
+
+        // Apply custom pino options if provided
+        if (options.pino) {
+            Object.assign(config, options.pino);
+        }
+
+        // Create directory if it doesn't exist
+        let fs = require('fs');
+        let path = require('path');
+        const logDir = path.dirname("logs/tslog/logs.txt");
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
+
+        this.instance = new this.tslog.Logger();
+
+        this.instance.attachTransport((logObj) => {
+            this.appendFileSync("logs/tslog/logs.txt", JSON.stringify(logObj) + "\n");
+        });
+    }
+
+    log(level, ...args) {
+        if (args.length === 1) {
+            return this.instance[level](args[0]);
+        }
+
+        const [message, ...meta] = args;
+        return this.instance[level]({ msg: message, ...meta });
+    }
+
+    cleanup() {
+        this.instance = null;
+        this.tslog = null;
+        this.appendFileSync = null;
+    }
+}
+
 // Register built-in loggers
 LoggerWrapper.registerLogger('Console', ConsoleLoggerAdapter);
 LoggerWrapper.registerLogger('MyLogger', MyLoggerAdapter);
 LoggerWrapper.registerLogger('JSNLog', JsnlogLoggerAdapter);
 LoggerWrapper.registerLogger('Winston', WinstonLoggerAdapter);
 LoggerWrapper.registerLogger('Pino', PinoLoggerAdapter);
+LoggerWrapper.registerLogger('tslog', tslogLoggerAdapter);
 
 module.exports = LoggerWrapper;
