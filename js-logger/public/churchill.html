@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Interaction Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <script src="js/event-elements-injector.js"></script>
+
+    <script src="js/logger-controls-injector.js"></script>
+    <script src="js/page-links-injector.js"></script>
+    <script src="js/session-id-manager.js"></script>
+    <script src="js/event-tracker.js"></script>
+
+    <script src="https://unpkg.com/churchill-client@0.1.1/dist/churchill.min.js"></script>
+
+    <script>
+        const logger = Churchill.create();
+        logger.config({
+            serverUrl: 'http://localhost:4000',
+            endpoint: '/api/event',
+            console: true,
+        })
+
+        // Helper function to send events to the server.
+        function sendEvent(level = 'info', details = {}) {
+            console.log('Sending', level, 'log:', details);
+
+            switch (level) {
+                case "info":
+                    logger.info(details);
+                    break;
+                case "error":
+                    logger.error(details);
+                    break;
+                default:
+                    logger.error('level', level, 'is not added to the switch case...');
+            }
+        }
+    </script>
+</body>
+
+</html>

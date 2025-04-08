@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * Logger Wrapper - A class to manage different logger implementations
  * allowing easy switching between logger types with proper cleanup.
@@ -246,6 +247,8 @@ class WinstonLoggerAdapter extends BaseLoggerAdapter {
         // Import winston only when needed
         this.winston = require('winston');
         this.instance = this.#createWinstonLogger(options);
+
+        this.winston.createLogger()
     }
 
     #createWinstonLogger(options) {
@@ -417,6 +420,39 @@ class tslogLoggerAdapter extends BaseLoggerAdapter {
     }
 }
 
+/**
+ * Churchill Logger Adapter
+ */
+class churchillLoggerAdapter extends BaseLoggerAdapter {
+    constructor(options = {}) {
+        super(options);
+        // Import churchill only when needed
+        this.churchill = require('churchill-logger/dist');
+
+        const config = {
+            level: options.level || 'info'
+        };
+
+        this.instance = new this.churchill.create(config);
+    }
+
+    log(level, ...args) {
+        let payload = {
+            level,
+            ...args
+        };
+        payload.message = payload.data;
+        delete payload.data;
+        console.log(payload);
+        return this.instance.processLog(payload);
+    }
+
+    cleanup() {
+        this.instance = null;
+        this.churchill = null;
+    }
+}
+
 // Register built-in loggers
 LoggerWrapper.registerLogger('Console', ConsoleLoggerAdapter);
 LoggerWrapper.registerLogger('MyLogger', MyLoggerAdapter);
@@ -424,5 +460,6 @@ LoggerWrapper.registerLogger('JSNLog', JsnlogLoggerAdapter);
 LoggerWrapper.registerLogger('Winston', WinstonLoggerAdapter);
 LoggerWrapper.registerLogger('Pino', PinoLoggerAdapter);
 LoggerWrapper.registerLogger('tslog', tslogLoggerAdapter);
+LoggerWrapper.registerLogger('Churchill', churchillLoggerAdapter);
 
 module.exports = LoggerWrapper;

@@ -10,6 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "adze": "^2.2.1",
+    "churchill-logger": "^0.1.0",
     "jsnlog": "^2.30.0",
     "jsnlog-nodejs": "^2.30.0",
     "loglevel": "^1.9.2",
