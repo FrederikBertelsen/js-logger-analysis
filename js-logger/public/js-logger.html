@@ -23,7 +23,8 @@
 
             const payload = {
                 level: context.level.name,
-                data: messages
+                data: messages,
+                time: Date.now()
             };
 
             // Send logs to the server
