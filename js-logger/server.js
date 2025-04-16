@@ -44,7 +44,7 @@ const serveStaticFile = (res, filePath) => {
 
 // Log duration collection configuration
 let logDurations = [];
-const LOG_BATCH_SIZE = 100000;
+const LOG_BATCH_SIZE = 5000;
 const LOG_FILE_PATH = path.join(__dirname, 'logDurations.txt');
 let isWritingToFile = false;
 
