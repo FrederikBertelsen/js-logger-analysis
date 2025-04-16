@@ -20,14 +20,14 @@
         // Helper function to send events to the server
         function sendEvent(level = 'info', details = {}) {
 
+            console.log('Sending', level, 'log:', details);
+
             const payload = {
                 sessionId: window.getSessionId(),
                 time: new Date().toISOString(),
                 level: level,
                 ...details
             };
-
-            console.log('Sending', level, 'log:', details);
 
             fetch('/api/event', {
                 method: 'POST',
