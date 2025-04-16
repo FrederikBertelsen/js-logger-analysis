@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const LoggerWrapper = require('./logger-wrapper');
 const utils = require('./utils');
+const { performance } = require('perf_hooks');
 
 const logger = new LoggerWrapper('console', { level: 'info' });
 const port = process.argv[2] || 4000;
@@ -41,6 +42,35 @@ const serveStaticFile = (res, filePath) => {
     });
 };
 
+// Log duration collection configuration
+let logDurations = [];
+const LOG_BATCH_SIZE = 100000;
+const LOG_FILE_PATH = path.join(__dirname, 'logDurations.txt');
+let isWritingToFile = false;
+
+// Function to append log durations to file
+const appendLogDurationsToFile = () => {
+    if (logDurations.length === 0 || isWritingToFile) return;
+
+    isWritingToFile = true;
+    const dataToWrite = logDurations.join('\n') + '\n';
+    logDurations = [];
+
+    fs.appendFile(LOG_FILE_PATH, dataToWrite, (err) => {
+        isWritingToFile = false;
+        if (err) {
+            console.error('Error writing to log durations file:', err);
+        } else {
+            console.log(`${dataToWrite.split('\n').length - 1} log durations appended to ${LOG_FILE_PATH}`);
+        }
+
+        // If more data accumulated while writing, write again
+        if (logDurations.length >= LOG_BATCH_SIZE) {
+            appendLogDurationsToFile();
+        }
+    });
+};
+
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -68,9 +98,23 @@ const server = http.createServer((req, res) => {
                     const level = log.level;
                     delete log.level;
 
-                    logger.log(level.toLowerCase(), log, time);
+                    const startedAt = performance.now();
+                    logger.log(level.toLowerCase(), log);
+                    const finishedAt = performance.now();
+
+                    const duration = finishedAt - startedAt;
+                    logDurations.push(duration);
                 } else {
-                    logger.log(log, time);
+                    const startedAt = performance.now();
+                    logger.log(log);
+                    const finishedAt = performance.now();
+
+                    const duration = finishedAt - startedAt;
+                    logDurations.push(duration);
+                }
+
+                if (logDurations.length >= LOG_BATCH_SIZE) {
+                    appendLogDurationsToFile();
                 }
             };
 
@@ -123,6 +167,15 @@ const server = http.createServer((req, res) => {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Not found');
     }
+});
+
+// Make sure any remaining log durations are written when the server is shutting down
+process.on('SIGINT', () => {
+    if (logDurations.length > 0) {
+        fs.appendFileSync(LOG_FILE_PATH, logDurations.join('\n') + '\n');
+        console.log(`Final ${logDurations.length} log durations saved before shutdown.`);
+    }
+    process.exit();
 });
 
 server.listen(port, () => console.log(`Server running on port ${port}`));
