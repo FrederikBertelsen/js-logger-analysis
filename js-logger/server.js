@@ -118,6 +118,12 @@ const server = http.createServer((req, res) => {
                 }
             };
 
+            if (json.logs) {
+                json.logs.forEach(processLogEntry);
+            } else {
+                processLogEntry(json);
+            }
+
             res.writeHead(200);
             res.end();
         }).catch((error) => {
