@@ -34,8 +34,8 @@
 
         document.body.prepend(container);
         document.getElementById('download-button').addEventListener('click', () => {
-            if (times.length >= 0){
-                downloadTextFile(times.toString(), 'download.txt');
+            if (times.length >= 0) {
+                downloadTextFile(times.join('\n'), 'download.txt');
                 times = []
             }
         });
@@ -56,8 +56,8 @@
                 body: JSON.stringify(payload)
             })
                 .catch(err => console.error('Error sending event:', err));
-            endTime = performance.now(); 
-            times.push(endTime-startTime)
+            endTime = performance.now();
+            times.push(endTime - startTime)
         }
     </script>
 </body>
