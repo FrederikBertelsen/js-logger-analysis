@@ -19,9 +19,28 @@
     <script src="https://cdn.jsdelivr.net/npm/js-logger@1.6.1/src/logger.min.js"></script>
 
     <script>
+        const container = document.createElement('div');
+        container.className = 'download-button';
+
+        // Create HTML structure for controls
+        container.innerHTML = `
+        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+            <button id="download-button">Download</button>
+        </div>
+        `;
+        var times = []
+        var startTime = performance.now()
+        var endTime = performance.now()
+
+        document.body.prepend(container);
+        document.getElementById('download-button').addEventListener('click', () => {
+            if (times.length >= 0){
+                downloadTextFile(times.toString(), 'download.txt');
+                times = []
+            }
+        });
         Logger.useDefaults();
         Logger.setHandler(function (messages, context) {
-
             const payload = {
                 level: context.level.name,
                 data: messages,
@@ -34,7 +53,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             }).catch((error) => console.error('Failed to send log:', error));
-
+            
         });
 
         // Helper function to send events to the server.
@@ -43,7 +62,10 @@
 
             switch (level) {
                 case "info":
+                    startTime = performance.now()
                     Logger.info(details)
+                    endTime = performance.now()
+                    times.push(endTime-startTime)
                     break;
                 case "error":
                     Logger.error(details);

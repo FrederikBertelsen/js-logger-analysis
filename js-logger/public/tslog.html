@@ -20,6 +20,26 @@
     <script src="js/tslog.min.js"></script>
 
     <script>
+        const container = document.createElement('div');
+        container.className = 'download-button';
+
+        // Create HTML structure for controls
+        container.innerHTML = `
+        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+            <button id="download-button">Download</button>
+        </div>
+        `;
+        var times = []
+        var startTime = performance.now()
+        var endTime = performance.now()
+
+        document.body.prepend(container);
+        document.getElementById('download-button').addEventListener('click', () => {
+            if (times.length >= 0){
+                downloadTextFile(times.toString(), 'download.txt');
+                times = []
+            }
+        });
         const logger = new tslog.Logger({
             type: "json",
             overwrite: {
@@ -44,8 +64,10 @@
         // Helper function to send events to the server
         function sendEvent(level = 'info', details = {}) {
             console.log('Sending', level, 'log:', details);
-
+            startTime = performance.now()
             logger[level](details);
+            endTime = performance.now()
+            times.push(endTime-startTime)
         }
     </script>
 </body>

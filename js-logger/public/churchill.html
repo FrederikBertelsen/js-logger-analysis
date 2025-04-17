@@ -18,7 +18,29 @@
 
     <script src="https://unpkg.com/churchill-client@0.1.1/dist/churchill.min.js"></script>
 
+    
     <script>
+        
+        const container = document.createElement('div');
+        container.className = 'download-button';
+
+        // Create HTML structure for controls
+        container.innerHTML = `
+        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+            <button id="download-button">Download</button>
+        </div>
+        `;
+        var times = []
+        var startTime = performance.now()
+        var endTime = performance.now()
+
+        document.body.prepend(container);
+        document.getElementById('download-button').addEventListener('click', () => {
+            if (times.length >= 0){
+                downloadTextFile(times.toString(), 'download.txt');
+                times = []
+            }
+        });
         const logger = Churchill.create();
         logger.config({
             serverUrl: '',
@@ -28,11 +50,13 @@
 
         // Helper function to send events to the server.
         function sendEvent(level = 'info', details = {}) {
-            console.log('Sending', level, 'log:', details);
 
+            console.log('Sending', level, 'log:', details);
             switch (level) {
                 case "info":
+                    startTime = performance.now()
                     logger.info(details);
+                    endTime = performance.now()
                     break;
                 case "error":
                     logger.error(details);
@@ -40,6 +64,7 @@
                 default:
                     logger.error('level', level, 'is not added to the switch case...');
             }
+            times.push(endTime-startTime)
         }
     </script>
 </body>

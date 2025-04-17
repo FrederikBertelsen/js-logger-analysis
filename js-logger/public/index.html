@@ -19,9 +19,29 @@
 
     <script>
         // Helper function to send events to the server
-        function sendEvent(level = 'info', details = {}) {
+        const container = document.createElement('div');
+        container.className = 'download-button';
 
+        // Create HTML structure for controls
+        container.innerHTML = `
+        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+            <button id="download-button">Download</button>
+        </div>
+        `;
+        var times = []
+        var startTime = performance.now()
+        var endTime = performance.now()
+
+        document.body.prepend(container);
+        document.getElementById('download-button').addEventListener('click', () => {
+            if (times.length >= 0){
+                downloadTextFile(times.toString(), 'download.txt');
+                times = []
+            }
+        });
+        function sendEvent(level = 'info', details = {}) {
             console.log('Sending', level, 'log:', details);
+            startTime = performance.now()
 
             const payload = {
                 sessionId: window.getSessionId(),
@@ -36,6 +56,8 @@
                 body: JSON.stringify(payload)
             })
                 .catch(err => console.error('Error sending event:', err));
+            endTime = performance.now(); 
+            times.push(endTime-startTime)
         }
     </script>
 </body>
