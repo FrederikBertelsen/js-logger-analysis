@@ -10,6 +10,10 @@
             <button id="btn-click">Click Me</button>
         </div>
 
+        <div class="form-group">
+            <button id="btn-click-big">Click Me BIG</button>
+        </div>
+
         <div class="form-group inline-group">
             <label for="text-input">Text Input:</label>
             <input type="text" id="text-input" placeholder="Type something...">

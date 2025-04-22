@@ -19,6 +19,16 @@ function setupButtonClickEvents() {
     document.getElementById('btn-click').addEventListener('click', () => {
         sendEvent('info', { event: 'buttonClicked' });
     });
+
+    var big_string = '';
+    for (var i = 0; i < 5000; i++) {
+        big_string += 'X';
+    }
+    window.big_string = big_string;
+
+    document.getElementById('btn-click-big').addEventListener('click', () => {
+        sendEvent('info', { event: window.big_string });
+    });
 }
 
 function setupTextInputEvents() {
