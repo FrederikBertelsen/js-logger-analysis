@@ -22,7 +22,9 @@ function setupButtonClickEvents() {
 
     var big_string = '';
     for (var i = 0; i < 5000; i++) {
-        big_string += 'X';
+        // Generate random character code in the printable ASCII range (32-126)
+        const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
+        big_string += String.fromCharCode(randomCharCode);
     }
     window.big_string = big_string;
 
