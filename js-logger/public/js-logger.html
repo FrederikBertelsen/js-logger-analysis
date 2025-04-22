@@ -40,7 +40,7 @@
             }
         });
         Logger.useDefaults();
-        Logger.setHandler(function (messages, context) {
+        Logger.setHandler(async function (messages, context) {
             const payload = {
                 level: context.level.name,
                 data: messages,
@@ -48,7 +48,7 @@
             };
 
             // Send logs to the server
-            fetch('/api/event', {
+            await fetch('/api/event', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),

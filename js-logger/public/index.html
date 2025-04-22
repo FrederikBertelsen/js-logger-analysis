@@ -39,7 +39,7 @@
                 times = []
             }
         });
-        function sendEvent(level = 'info', details = {}) {
+        async function sendEvent(level = 'info', details = {}) {
             console.log('Sending', level, 'log:', details);
             startTime = performance.now()
 
@@ -50,7 +50,7 @@
                 ...details
             };
 
-            fetch('/api/event', {
+            await fetch('/api/event', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

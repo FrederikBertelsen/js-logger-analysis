@@ -43,7 +43,7 @@
         const logger = new tslog.Logger({
             type: "json",
             overwrite: {
-                transportJSON: (logObjWithMeta) => {
+                transportJSON: async (logObjWithMeta) => {
                     // logObjWithMeta._meta.path = JSON.stringify(logObjWithMeta._meta.path);
 
                     const payload = {
@@ -52,7 +52,7 @@
                     };
 
                     // Send logs to the server
-                    fetch('/api/event', {
+                    await fetch('/api/event', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload),
