@@ -111,8 +111,12 @@
             var startTime = performance.now()
             var endTime = performance.now()
 
+            const sleepTime = 5;
+
             // 100K LOOP
             for (var i = 0; i < 100000; i++) {
+                await new Promise(resolve => setTimeout(resolve, sleepTime));
+
                 startTime = performance.now()
 
                 // ### SEND LOGS ###
@@ -132,7 +136,7 @@
                 `Logs send: ${times.length}\n` +
                 `Start Time: ${testStartTimeString}\n` +
                 `End Time: ${new Date().toISOString()}\n` +
-                `Total Time: ${testEndTime - testStartTime} ms\n\n` +
+                `Total Time: ${(testEndTime - testStartTime) + (times.length * sleepTime)} ms\n\n` +
                 `Average Log Time: ${times.reduce((a, b) => a + b) / times.length}\n` +
                 `Max Log Time: ${Math.max(...times)}\n` +
                 `Min Log Time: ${Math.min(...times)}\n` +
