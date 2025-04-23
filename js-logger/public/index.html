@@ -15,30 +15,30 @@
     <script src="js/page-links-injector.js"></script>
     <script src="js/session-id-manager.js"></script>
     <!-- <script src="js/event-tracker.js"></script> -->
-    <script src="js/download-string.js"></script>
+    <!-- <script src="js/download-string.js"></script> -->
 
     <script>
-        // Helper function to send events to the server
-        const container = document.createElement('div');
-        container.className = 'download-button';
+        // // Helper function to send events to the server
+        // const container = document.createElement('div');
+        // container.className = 'download-button';
 
-        // Create HTML structure for controls
-        container.innerHTML = `
-        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
-            <button id="download-button">Download</button>
-        </div>
-        `;
-        var times = []
-        var startTime = performance.now()
-        var endTime = performance.now()
+        // // Create HTML structure for controls
+        // container.innerHTML = `
+        // <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+        //     <button id="download-button">Download</button>
+        // </div>
+        // `;
+        // var times = []
+        // var startTime = performance.now()
+        // var endTime = performance.now()
 
-        document.body.prepend(container);
-        document.getElementById('download-button').addEventListener('click', () => {
-            if (times.length >= 0) {
-                downloadTextFile(times.join('\n'), 'download.txt');
-                times = []
-            }
-        });
+        // document.body.prepend(container);
+        // document.getElementById('download-button').addEventListener('click', () => {
+        //     if (times.length >= 0) {
+        //         downloadTextFile(times.join('\n'), 'download.txt');
+        //         times = []
+        //     }
+        // });
         // async function sendEvent(level = 'info', details = {}) {
         //     console.log('Sending', level, 'log:', details);
         //     startTime = performance.now()
@@ -60,6 +60,9 @@
         //     times.push(endTime - startTime)
         // }
 
+        var logText = "";
+        var payloadString = "";
+
         async function send100kLogs(bigLog = false) {
             if (window.running && window.running === true) {
                 console.log("Already running!");
@@ -68,6 +71,8 @@
             window.running = true;
 
             console.log(`Sending 100k ${bigLog ? "BIG" : "small"} logs`);
+            const testStartTime = performance.now();
+            const testStartTimeString = new Date().toISOString();
 
             // generate payload
             logText = "";
@@ -80,27 +85,54 @@
             } else {
                 logText += "button clicked"
             }
-            const payloadString = JSON.stringify({
+
+            payloadString = JSON.stringify({
                 sessionId: window.getSessionId(),
                 time: new Date().toISOString(),
                 level: "info",
                 text: logText
             });
 
+            var times = []
+            var startTime = performance.now()
+            var endTime = performance.now()
+
             // 100K LOOP
-            for (var i = 0; i < 100000; i++) {
+            for (var i = 0; i < 100; i++) {
                 startTime = performance.now()
 
-                await fetch('/api/event', {
+                // ### SEND LOGS ###
+
+                console.log(logText);
+
+                // await fetch('/api/event', {
+                fetch('/api/event', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: payloadString
                 })
                     .catch(err => console.error('Error sending event:', err));
 
+                // #################
+
                 endTime = performance.now();
                 times.push(endTime - startTime)
             }
+
+            const testEndTime = performance.now();
+            console.log(
+                `Logger: Just a fetch() call\n` +
+                `Logs send: ${times.length}\n` +
+                `Start Time: ${testStartTimeString}\n` +
+                `End Time: ${new Date().toISOString()}\n` +
+                `Total Time: ${testEndTime - testStartTime} ms\n\n` +
+                `Average Log Time: ${times.reduce((a, b) => a + b) / times.length}\n` +
+                `Max Log Time: ${Math.max(...times)}\n` +
+                `Min Log Time: ${Math.min(...times)}\n` +
+                `Total Log Time: ${times.reduce((a, b) => a + b)}\n`
+            );
+
+            window.running = false;
         }
         // set listeners for button clicks
         document.getElementById('btn-click-loop').addEventListener('click', () => {

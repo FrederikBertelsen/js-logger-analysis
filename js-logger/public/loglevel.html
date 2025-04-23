@@ -12,34 +12,35 @@
 
     <script src="js/logger-controls-injector.js"></script>
     <script src="js/page-links-injector.js"></script>
-    <script src="js/session-id-manager.js"></script>
-    <script src="js/event-tracker.js"></script>
-    <script src="js/download-string.js"></script>
+    <!-- <script src="js/session-id-manager.js"></script> -->
+    <!-- <script src="js/event-tracker.js"></script> -->
+    <!-- <script src="js/download-string.js"></script> -->
 
     <script src="https://unpkg.com/loglevel@1.9.2/dist/loglevel.min.js"></script>
     <script src="https://unpkg.com/loglevel-plugin-remote@^0.6/dist/loglevel-plugin-remote.min.js"></script>
 
     <script>
-        const container = document.createElement('div');
-        container.className = 'download-button';
+        // const container = document.createElement('div');
+        // container.className = 'download-button';
 
-        // Create HTML structure for controls
-        container.innerHTML = `
-        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
-            <button id="download-button">Download</button>
-        </div>
-        `;
-        var times = []
-        var startTime = performance.now()
-        var endTime = performance.now()
+        // // Create HTML structure for controls
+        // container.innerHTML = `
+        // <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+        //     <button id="download-button">Download</button>
+        // </div>
+        // `;
+        // var times = []
+        // var startTime = performance.now()
+        // var endTime = performance.now()
 
-        document.body.prepend(container);
-        document.getElementById('download-button').addEventListener('click', () => {
-            if (times.length >= 0){
-                downloadTextFile(times.toString(), 'download.txt');
-                times = []
-            }
-        });
+        // document.body.prepend(container);
+        // document.getElementById('download-button').addEventListener('click', () => {
+        //     if (times.length >= 0){
+        //         downloadTextFile(times.toString(), 'download.txt');
+        //         times = []
+        //     }
+        // });
+
         // loglevel-plugin-remote options
         const options = {
             url: '/api/event',
@@ -72,26 +73,90 @@
         let logger = log.getLogger('LogLevel-Remote');
         logger.enableAll();
 
-        // Helper function to send events to the server.
-        function sendEvent(level = 'info', details = {}) {
-            console.log('Sending', level, 'log:', details);
+        // // Helper function to send events to the server.
+        // function sendEvent(level = 'info', details = {}) {
+        //     console.log('Sending', level, 'log:', details);
 
-            details = JSON.stringify(details);
+        //     details = JSON.stringify(details);
 
-            switch (level) {
-                case "info":
-                    startTime = performance.now()
-                    logger.info(details)
-                    endTime = performance.now()
-                    times.push(endTime-startTime)
-                    break;
-                case "error":
-                    logger.error(details);
-                    break;
-                default:
-                    logger.error('level', level, 'is not added to the switch case...');
+        //     switch (level) {
+        //         case "info":
+        //             startTime = performance.now()
+        //             logger.info(details)
+        //             endTime = performance.now()
+        //             times.push(endTime-startTime)
+        //             break;
+        //         case "error":
+        //             logger.error(details);
+        //             break;
+        //         default:
+        //             logger.error('level', level, 'is not added to the switch case...');
+        //     }
+        // }
+
+        async function send100kLogs(bigLog = false) {
+            if (window.running && window.running === true) {
+                console.log("Already running!");
+                return;
             }
+            window.running = true;
+
+            console.log(`Sending 100k ${bigLog ? "BIG" : "small"} logs`);
+            const testStartTime = performance.now();
+            const testStartTimeString = new Date().toISOString();
+
+            logText = "";
+            if (bigLog) {
+                for (var i = 0; i < 5000; i++) {
+                    // Generate random character code in the printable ASCII range (32-126)
+                    const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
+                    logText += String.fromCharCode(randomCharCode);
+                }
+            } else {
+                logText += "button clicked"
+            }
+
+            var times = []
+            var startTime = performance.now()
+            var endTime = performance.now()
+
+            // 100K LOOP
+            for (var i = 0; i < 100; i++) {
+                startTime = performance.now()
+
+                // ### SEND LOGS ###
+
+                await logger.info(logText);
+
+                // #################
+
+                endTime = performance.now();
+                times.push(endTime - startTime)
+            }
+
+            const testEndTime = performance.now();
+            console.log(
+                `Logger: LogLevel\n` +
+                `Big logs: ${bigLog}\n` +
+                `Logs send: ${times.length}\n` +
+                `Start Time: ${testStartTimeString}\n` +
+                `End Time: ${new Date().toISOString()}\n` +
+                `Total Time: ${testEndTime - testStartTime} ms\n\n` +
+                `Average Log Time: ${times.reduce((a, b) => a + b) / times.length}\n` +
+                `Max Log Time: ${Math.max(...times)}\n` +
+                `Min Log Time: ${Math.min(...times)}\n` +
+                `Total Log Time: ${times.reduce((a, b) => a + b)}\n`
+            );
+
+            window.running = false;
         }
+        // set listeners for button clicks
+        document.getElementById('btn-click-loop').addEventListener('click', () => {
+            send100kLogs(false);
+        });
+        document.getElementById('btn-click-loop-big').addEventListener('click', () => {
+            send100kLogs(true);
+        });
     </script>
 </body>
 
