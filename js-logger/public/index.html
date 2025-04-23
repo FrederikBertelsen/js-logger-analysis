@@ -99,9 +99,12 @@
 
             // 100K LOOP
             for (var i = 0; i < 10000; i++) {
+                await new Promise(resolve => setTimeout(resolve, 10));
+
                 startTime = performance.now()
 
                 // ### SEND LOGS ###
+
 
                 console.log(logText);
 
