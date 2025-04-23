@@ -7,6 +7,13 @@
         <p>Interact with these elements to send events to the server.</p>
 
         <div class="form-group">
+            <button id="btn-click-loop">Send 100.000 small logs</button>
+        </div>
+        <div class="form-group">
+            <button id="btn-click-loop-big">Send 100.000 BIG logs</button>
+        </div>
+
+        <div class="form-group">
             <button id="btn-click">Click Me</button>
         </div>
 

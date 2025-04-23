@@ -14,7 +14,7 @@
     <script src="js/logger-controls-injector.js"></script>
     <script src="js/page-links-injector.js"></script>
     <script src="js/session-id-manager.js"></script>
-    <script src="js/event-tracker.js"></script>
+    <!-- <script src="js/event-tracker.js"></script> -->
     <script src="js/download-string.js"></script>
 
     <script>
@@ -39,26 +39,76 @@
                 times = []
             }
         });
-        async function sendEvent(level = 'info', details = {}) {
-            console.log('Sending', level, 'log:', details);
-            startTime = performance.now()
+        // async function sendEvent(level = 'info', details = {}) {
+        //     console.log('Sending', level, 'log:', details);
+        //     startTime = performance.now()
 
-            const payload = {
+        //     const payload = {
+        //         sessionId: window.getSessionId(),
+        //         time: new Date().toISOString(),
+        //         level: level,
+        //         ...details
+        //     };
+
+        //     await fetch('/api/event', {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify(payload)
+        //     })
+        //         .catch(err => console.error('Error sending event:', err));
+        //     endTime = performance.now();
+        //     times.push(endTime - startTime)
+        // }
+
+        async function send100kLogs(bigLog = false) {
+            if (window.running && window.running === true) {
+                console.log("Already running!");
+                return;
+            }
+            window.running = true;
+
+            console.log(`Sending 100k ${bigLog ? "BIG" : "small"} logs`);
+
+            // generate payload
+            logText = "";
+            if (bigLog) {
+                for (var i = 0; i < 5000; i++) {
+                    // Generate random character code in the printable ASCII range (32-126)
+                    const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
+                    logText += String.fromCharCode(randomCharCode);
+                }
+            } else {
+                logText += "button clicked"
+            }
+            const payloadString = JSON.stringify({
                 sessionId: window.getSessionId(),
                 time: new Date().toISOString(),
-                level: level,
-                ...details
-            };
+                level: "info",
+                text: logText
+            });
 
-            await fetch('/api/event', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .catch(err => console.error('Error sending event:', err));
-            endTime = performance.now();
-            times.push(endTime - startTime)
+            // 100K LOOP
+            for (var i = 0; i < 100000; i++) {
+                startTime = performance.now()
+
+                await fetch('/api/event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: payloadString
+                })
+                    .catch(err => console.error('Error sending event:', err));
+
+                endTime = performance.now();
+                times.push(endTime - startTime)
+            }
         }
+        // set listeners for button clicks
+        document.getElementById('btn-click-loop').addEventListener('click', () => {
+            send100kLogs(false);
+        });
+        document.getElementById('btn-click-loop-big').addEventListener('click', () => {
+            send100kLogs(true);
+        });
     </script>
 </body>
 
