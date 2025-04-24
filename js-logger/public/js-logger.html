@@ -94,26 +94,24 @@
             const testStartTime = performance.now();
             const testStartTimeString = new Date().toISOString();
 
-            logText = "";
-            if (bigLog) {
-                for (var i = 0; i < 5000; i++) {
-                    // Generate random character code in the printable ASCII range (32-126)
-                    const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
-                    logText += String.fromCharCode(randomCharCode);
-                }
-            } else {
-                logText += "button clicked"
-            }
-
             var times = []
             var startTime = performance.now()
             var endTime = performance.now()
 
-            const sleepTime = 5;
 
             // 100K LOOP
             for (var i = 0; i < 100000; i++) {
-                await new Promise(resolve => setTimeout(resolve, sleepTime));
+                // generate log text
+                logText = "";
+                if (bigLog) {
+                    for (var i = 0; i < 5000; i++) {
+                        // Generate random character code in the printable ASCII range (32-126)
+                        const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
+                        logText += String.fromCharCode(randomCharCode);
+                    }
+                } else {
+                    logText = "button clicked"
+                }
 
                 startTime = performance.now()
 
@@ -134,7 +132,7 @@
                 `Logs send: ${times.length}\n` +
                 `Start Time: ${testStartTimeString}\n` +
                 `End Time: ${new Date().toISOString()}\n` +
-                `Total Time: ${(testEndTime - testStartTime) - (times.length * sleepTime)} ms\n\n` +
+                `Total Time: ${testEndTime - testStartTime} ms\n\n` +
                 `Average Log Time: ${times.reduce((a, b) => a + b) / times.length}\n` +
                 `Max Log Time: ${Math.max(...times)}\n` +
                 `Min Log Time: ${Math.min(...times)}\n` +
