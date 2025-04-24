@@ -80,42 +80,42 @@
             return lvl.value >= filterLevel.value;
         },
 
-        trace: function () {
-            this.invoke(Logger.TRACE, arguments);
+        trace: async function () {
+            await this.invoke(Logger.TRACE, arguments);
         },
 
-        debug: function () {
-            this.invoke(Logger.DEBUG, arguments);
+        debug: async function () {
+            await this.invoke(Logger.DEBUG, arguments);
         },
 
-        info: function () {
-            this.invoke(Logger.INFO, arguments);
+        info: async function () {
+            await this.invoke(Logger.INFO, arguments);
         },
 
-        warn: function () {
-            this.invoke(Logger.WARN, arguments);
+        warn: async function () {
+            await this.invoke(Logger.WARN, arguments);
         },
 
-        error: function () {
-            this.invoke(Logger.ERROR, arguments);
+        error: async function () {
+            await this.invoke(Logger.ERROR, arguments);
         },
 
-        time: function (label) {
+        time: async function (label) {
             if (typeof label === 'string' && label.length > 0) {
-                this.invoke(Logger.TIME, [label, 'start']);
+                await this.invoke(Logger.TIME, [label, 'start']);
             }
         },
 
-        timeEnd: function (label) {
+        timeEnd: async function (label) {
             if (typeof label === 'string' && label.length > 0) {
-                this.invoke(Logger.TIME, [label, 'end']);
+                await this.invoke(Logger.TIME, [label, 'end']);
             }
         },
 
         // Invokes the logger callback if it's not being filtered.
-        invoke: function (level, msgArgs) {
+        invoke: async function (level, msgArgs) {
             if (logHandler && this.enabledFor(level)) {
-                logHandler(msgArgs, merge({ level: level }, this.context));
+                await logHandler(msgArgs, merge({ level: level }, this.context));
             }
         }
     };

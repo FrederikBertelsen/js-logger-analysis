@@ -16,7 +16,8 @@
     <!-- <script src="js/event-tracker.js"></script> -->
     <!-- <script src="js/download-string.js"></script> -->
 
-    <script src="https://cdn.jsdelivr.net/npm/js-logger@1.6.1/src/logger.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/js-logger@1.6.1/src/logger.min.js"></script> -->
+    <script src="loggers/jslogger.js"></script>
 
     <script>
         // const container = document.createElement('div');
@@ -48,11 +49,13 @@
         var consoleHandler = Logger.createDefaultHandler();
         Logger.setHandler(async function (messages, context) {
             consoleHandler(messages, context);
+
             const payload = {
                 level: context.level.name,
                 data: messages,
                 time: Date.now()
             };
+
             // Send logs to the server
             await fetch('/api/event', {
                 method: 'POST',
