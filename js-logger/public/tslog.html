@@ -17,7 +17,8 @@
     <!-- <script src="js/event-tracker.js"></script> -->
     <!-- <script src="js/download-string.js"></script> -->
 
-    <script src="js/tslog.min.js"></script>
+    <!-- <script src="js/tslog.min.js"></script> -->
+    <script src="loggers/tslog.js"></script>
 
     <script>
         // const container = document.createElement('div');
@@ -62,14 +63,14 @@
             // },
         });
 
-        logger.attachTransport((logObj) => {
+        logger.attachTransport(async (logObj) => {
             const payload = {
                 level: logObj._meta.logLevelName.toLowerCase(),
                 data: logObj
             };
 
             // Send logs to the server
-            fetch('/api/event', {
+            await fetch('/api/event', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -114,7 +115,7 @@
             const sleepTime = 5;
 
             // 100K LOOP
-            for (var i = 0; i < 100000; i++) {
+            for (var i = 0; i < 100; i++) {
                 await new Promise(resolve => setTimeout(resolve, sleepTime));
 
                 startTime = performance.now()
