@@ -102,7 +102,7 @@ var Churchill = function () {
     async function _sendLog(serverUrl, payload) {
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", serverUrl, true); // Asynchronous POST request
+            xhr.open("POST", serverUrl, false); // Asynchronous POST request
             xhr.setRequestHeader("Content-Type", "application/json");
 
             // Handle HTTP status errors (4xx, 5xx) and success
