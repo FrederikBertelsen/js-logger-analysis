@@ -15,7 +15,7 @@
     <script src="js/page-links-injector.js"></script>
     <script src="js/session-id-manager.js"></script>
     <!-- <script src="js/event-tracker.js"></script> -->
-    <!-- <script src="js/download-string.js"></script> -->
+    <script src="js/download-string.js"></script>
 
     <script>
         // // Helper function to send events to the server
@@ -28,17 +28,17 @@
         //     <button id="download-button">Download</button>
         // </div>
         // `;
-        // var times = []
-        // var startTime = performance.now()
-        // var endTime = performance.now()
+        var times = []
+        var startTime = performance.now()
+        var endTime = performance.now()
 
-        // document.body.prepend(container);
-        // document.getElementById('download-button').addEventListener('click', () => {
-        //     if (times.length >= 0) {
-        //         downloadTextFile(times.join('\n'), 'download.txt');
-        //         times = []
-        //     }
-        // });
+        document.body.prepend(container);
+        document.getElementById('download-button').addEventListener('click', () => {
+            if (times.length >= 0) {
+                downloadTextFile(times.join('\n'), 'download.txt');
+                times = []
+            }
+        });
         // async function sendEvent(level = 'info', details = {}) {
         //     console.log('Sending', level, 'log:', details);
         //     startTime = performance.now()
@@ -75,15 +75,25 @@
             const testStartTimeString = new Date().toISOString();
 
             // generate payload
-            logText = "";
+
+            //const sleepTime = 5;
+
+            // 100K LOOP
+            for (var i = 0; i < 100; i++) {
+                
+                logText = "";
             if (bigLog) {
-                for (var i = 0; i < 5000; i++) {
+                for (var j = 0; j < 5000; j++) {
                     // Generate random character code in the printable ASCII range (32-126)
                     const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
                     logText += String.fromCharCode(randomCharCode);
                 }
             } else {
-                logText += "button clicked"
+                for (var j = 0; j < 100; j++) {
+                    // Generate random character code in the printable ASCII range (32-126)
+                    const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
+                    logText += String.fromCharCode(randomCharCode);
+                }
             }
 
             payloadString = JSON.stringify({
@@ -93,15 +103,7 @@
                 text: logText
             });
 
-            var times = []
-            var startTime = performance.now()
-            var endTime = performance.now()
-
-            const sleepTime = 5;
-
-            // 100K LOOP
-            for (var i = 0; i < 100000; i++) {
-                await new Promise(resolve => setTimeout(resolve, sleepTime));
+                //await new Promise(resolve => setTimeout(resolve, sleepTime));
 
                 startTime = performance.now()
 
@@ -129,7 +131,7 @@
                 `Logs send: ${times.length}\n` +
                 `Start Time: ${testStartTimeString}\n` +
                 `End Time: ${new Date().toISOString()}\n` +
-                `Total Time: ${(testEndTime - testStartTime) - (times.length * sleepTime)} ms\n\n` +
+                `Total Time: ${(testEndTime - testStartTime)} ms\n\n` +
                 `Average Log Time: ${times.reduce((a, b) => a + b) / times.length}\n` +
                 `Max Log Time: ${Math.max(...times)}\n` +
                 `Min Log Time: ${Math.min(...times)}\n` +
