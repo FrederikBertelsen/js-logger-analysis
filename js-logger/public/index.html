@@ -111,12 +111,11 @@
                 console.log(logText);
 
                 // await fetch('/api/event', {
-                fetch('/api/event', {
+                await fetch('/api/event', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: payloadString
-                })
-                    .catch(err => console.error('Error sending event:', err));
+                }).catch(err => console.error('Error sending event:', err));
 
                 // #################
 
