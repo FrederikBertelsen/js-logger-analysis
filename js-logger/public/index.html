@@ -18,16 +18,16 @@
     <script src="js/download-string.js"></script>
 
     <script>
-        // // Helper function to send events to the server
-        // const container = document.createElement('div');
-        // container.className = 'download-button';
+        // Helper function to send events to the server
+        const container = document.createElement('div');
+        container.className = 'download-button';
 
-        // // Create HTML structure for controls
-        // container.innerHTML = `
-        // <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
-        //     <button id="download-button">Download</button>
-        // </div>
-        // `;
+        // Create HTML structure for controls
+        container.innerHTML = `
+        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+            <button id="download-button">Download</button>
+        </div>
+        `;
         var times = []
         var startTime = performance.now()
         var endTime = performance.now()
