@@ -14,32 +14,32 @@
     <script src="js/page-links-injector.js"></script>
     <!-- <script src="js/session-id-manager.js"></script> -->
     <!-- <script src="js/event-tracker.js"></script> -->
-    <!-- <script src="js/download-string.js"></script> -->
+    <script src="js/download-string.js"></script>
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/js-logger@1.6.1/src/logger.min.js"></script> -->
     <script src="loggers/jslogger.js"></script>
 
     <script>
-        // const container = document.createElement('div');
-        // container.className = 'download-button';
+        const container = document.createElement('div');
+        container.className = 'download-button';
 
-        // // Create HTML structure for controls
-        // container.innerHTML = `
-        // <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
-        //     <button id="download-button">Download</button>
-        // </div>
-        // `;
-        // var times = []
-        // var startTime = performance.now()
-        // var endTime = performance.now()
+        // Create HTML structure for controls
+        container.innerHTML = `
+        <div class="inline-group" style="display: flex; justify-content: center; align-items: center;">
+            <button id="download-button">Download</button>
+        </div>
+        `;
+        var times = []
+        var startTime = performance.now()
+        var endTime = performance.now()
 
-        // document.body.prepend(container);
-        // document.getElementById('download-button').addEventListener('click', () => {
-        //     if (times.length >= 0) {
-        //         downloadTextFile(times.toString(), 'download.txt');
-        //         times = []
-        //     }
-        // });
+        document.body.prepend(container);
+        document.getElementById('download-button').addEventListener('click', () => {
+            if (times.length >= 0) {
+                downloadTextFile(times.toString(), 'js-logger-log-times.txt');
+                times = []
+            }
+        });
 
         // generate payload
         var logText = "";
@@ -94,17 +94,14 @@
             const testStartTime = performance.now();
             const testStartTimeString = new Date().toISOString();
 
-            var times = []
-            var startTime = performance.now()
-            var endTime = performance.now()
-
+            times = []
 
             // 100K LOOP
             for (var i = 0; i < 100000; i++) {
                 // generate log text
                 logText = "";
                 if (bigLog) {
-                    for (var i = 0; i < 5000; i++) {
+                    for (var j = 0; j < 5000; j++) {
                         // Generate random character code in the printable ASCII range (32-126)
                         const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
                         logText += String.fromCharCode(randomCharCode);

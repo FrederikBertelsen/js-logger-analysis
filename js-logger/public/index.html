@@ -35,7 +35,7 @@
         document.body.prepend(container);
         document.getElementById('download-button').addEventListener('click', () => {
             if (times.length >= 0) {
-                downloadTextFile(times.join('\n'), 'download.txt');
+                downloadTextFile(times.join('\n'), 'just-fetch-log-times.txt');
                 times = []
             }
         });
@@ -78,8 +78,10 @@
 
             //const sleepTime = 5;
 
+            times = [];
+
             // 100K LOOP
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 100000; i++) {
                 
                 logText = "";
             if (bigLog) {
@@ -131,7 +133,7 @@
                 `Logs send: ${times.length}\n` +
                 `Start Time: ${testStartTimeString}\n` +
                 `End Time: ${new Date().toISOString()}\n` +
-                `Total Time: ${(testEndTime - testStartTime)} ms\n\n` +
+                `Total Time: ${testEndTime - testStartTime} ms\n\n` +
                 `Average Log Time: ${times.reduce((a, b) => a + b) / times.length}\n` +
                 `Max Log Time: ${Math.max(...times)}\n` +
                 `Min Log Time: ${Math.min(...times)}\n` +
