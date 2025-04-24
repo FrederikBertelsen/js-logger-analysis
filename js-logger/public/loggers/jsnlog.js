@@ -484,17 +484,17 @@ function JL(loggerName) {
         Appender.prototype.batchBufferHasStrandedMessage = function () {
             return (!(JL.maxMessages == null)) && (JL.maxMessages < 1) && (this.batchBuffer.length > 0);
         };
-        Appender.prototype.sendBatchIfComplete = function () {
+        Appender.prototype.sendBatchIfComplete = async function () {
             if ((this.batchBuffer.length >= this.batchSize) ||
                 this.batchBufferHasOverdueMessages() ||
                 this.batchBufferHasStrandedMessage()) {
-                this.sendBatch();
+                await this.sendBatch();
             }
         };
-        Appender.prototype.onSendingEnded = function () {
+        Appender.prototype.onSendingEnded = async function () {
             clearTimer(this.sendTimeoutTimer);
             this.nbrLogItemsBeingSent = 0;
-            this.sendBatchIfComplete();
+            await this.sendBatchIfComplete();
         };
         Appender.prototype.setOptions = function (options) {
             copyProperty("level", options, this);
@@ -538,7 +538,7 @@ function JL(loggerName) {
         message - log item. If the user logged an object, this is the JSON string.  Not used by Winston transports.
         loggerName: name of the logger.  Not used by Winston transports.
         */
-        Appender.prototype.log = function (level, msg, meta, callback, levelNbr, message, loggerName) {
+        Appender.prototype.log = async function (level, msg, meta, callback, levelNbr, message, loggerName) {
             var logItem;
             if (!allow(this)) {
                 return;
@@ -576,14 +576,14 @@ function JL(loggerName) {
                     this.buffer.length = 0;
                 }
             }
-            this.sendBatchIfComplete();
+            await this.sendBatchIfComplete();
         };
         ;
         // Processes the batch buffer
         //
         // Make this public, so it can be called from outside the library,
         // when the page is unloaded.
-        Appender.prototype.sendBatch = function () {
+        Appender.prototype.sendBatch = async function () {
             // Do not clear the batch timer if you don't go ahead here because
             // a send is already in progress. Otherwise the messages that were stopped from going out
             // may get ignored because the batch timer never went off.
@@ -597,10 +597,10 @@ function JL(loggerName) {
             // Decided at this point to send contents of the buffer
             this.nbrLogItemsBeingSent = this.batchBuffer.length;
             var that = this;
-            setTimer(this.sendTimeoutTimer, this.sendTimeout, function () {
-                that.onSendingEnded.call(that);
+            setTimer(this.sendTimeoutTimer, this.sendTimeout, async function () {
+                await that.onSendingEnded.call(that);
             });
-            this.sendLogItems(this.batchBuffer, function () {
+            await this.sendLogItems(this.batchBuffer, async function () {
                 // Log entries have been successfully sent to server
                 // Remove the first (nbrLogItemsBeingSent) items in the batch buffer, because they are the ones
                 // that were sent.
@@ -610,7 +610,7 @@ function JL(loggerName) {
                     that.batchBuffer.push(newLogItem(getWarnLevel(), "Lost " + that.nbrLogItemsSkipped + " messages. Either connection with the server was down or logging was disabled via the enabled option. Reduce lost messages by increasing the ajaxAppender option maxBatchSize.", that.appenderName));
                     that.nbrLogItemsSkipped = 0;
                 }
-                that.onSendingEnded.call(that);
+                await that.onSendingEnded.call(that);
             });
         };
         return Appender;
@@ -628,7 +628,7 @@ function JL(loggerName) {
             _super.prototype.setOptions.call(this, options);
             return this;
         };
-        AjaxAppender.prototype.sendLogItemsAjax = function (logItems, successCallback) {
+        AjaxAppender.prototype.sendLogItemsAjax = async function (logItems, successCallback) {
             // JSON.stringify is only supported on IE8+
             // Use try-catch in case we get an exception here.
             //
@@ -682,21 +682,21 @@ function JL(loggerName) {
                 if (this.url) {
                     ajaxUrl = this.url;
                 }
-                this.xhr.open('POST', ajaxUrl);
+                this.xhr.open('POST', ajaxUrl, false);
                 this.xhr.setRequestHeader('Content-Type', 'application/json');
                 this.xhr.setRequestHeader('JSNLog-RequestId', JL.requestId);
-                var that = this;
-                this.xhr.onreadystatechange = function () {
-                    // On most browsers, if the request fails (eg. internet is gone),
-                    // it will set xhr.readyState == 4 and xhr.status != 200 (0 if request could not be sent) immediately.
-                    // However, Edge and IE will not change the readyState at all if the internet goes away while waiting
-                    // for a response.
-                    // Some servers will return a 204 (success, no content) when the JSNLog endpoint
-                    // returns the empty response. So check on any code in the 2.. range, not just 200.
-                    if ((that.xhr.readyState == 4) && (that.xhr.status >= 200 && that.xhr.status < 300)) {
-                        successCallback();
-                    }
-                };
+                // var that = this;
+                // this.xhr.onreadystatechange = function () {
+                //     // On most browsers, if the request fails (eg. internet is gone),
+                //     // it will set xhr.readyState == 4 and xhr.status != 200 (0 if request could not be sent) immediately.
+                //     // However, Edge and IE will not change the readyState at all if the internet goes away while waiting
+                //     // for a response.
+                //     // Some servers will return a 204 (success, no content) when the JSNLog endpoint
+                //     // returns the empty response. So check on any code in the 2.. range, not just 200.
+                //     if ((that.xhr.readyState == 4) && (that.xhr.status >= 200 && that.xhr.status < 300)) {
+                //         successCallback();
+                //     }
+                // };
                 var json = {
                     r: JL.requestId,
                     lg: logItems
@@ -711,7 +711,11 @@ function JL(loggerName) {
                     JL.defaultBeforeSend.call(this, this.xhr, json);
                 }
                 var finalmsg = JSON.stringify(json);
-                this.xhr.send(finalmsg);
+                await this.xhr.send(finalmsg);
+
+                if (this.xhr.status >= 200 && this.xhr.status < 300) {
+                    await successCallback();
+                }
             }
             catch (e) { }
         };
@@ -866,7 +870,7 @@ function JL(loggerName) {
         // The resulting exception object is than worked into a message to the server.
         //
         // If there is no exception, logObject itself is worked into the message to the server.
-        Logger.prototype.log = function (level, logObject, e) {
+        Logger.prototype.log = async function (level, logObject, e) {
             var i = 0;
             var compositeMessage;
             var excObject;
@@ -905,20 +909,20 @@ function JL(loggerName) {
                     // Do not add fields to compositeMessage.meta, otherwise the user's object will get that field out of the blue.
                     i = this.appenders.length - 1;
                     while (i >= 0) {
-                        this.appenders[i].log(levelToString(level), compositeMessage.msg, compositeMessage.meta, function () { }, level, compositeMessage.finalString, this.loggerName);
+                        await this.appenders[i].log(levelToString(level), compositeMessage.msg, compositeMessage.meta, function () { }, level, compositeMessage.finalString, this.loggerName);
                         i--;
                     }
                 }
             }
             return this;
         };
-        Logger.prototype.trace = function (logObject) { return this.log(getTraceLevel(), logObject); };
-        Logger.prototype.debug = function (logObject) { return this.log(getDebugLevel(), logObject); };
-        Logger.prototype.info = function (logObject) { return this.log(getInfoLevel(), logObject); };
-        Logger.prototype.warn = function (logObject) { return this.log(getWarnLevel(), logObject); };
-        Logger.prototype.error = function (logObject) { return this.log(getErrorLevel(), logObject); };
-        Logger.prototype.fatal = function (logObject) { return this.log(getFatalLevel(), logObject); };
-        Logger.prototype.fatalException = function (logObject, e) { return this.log(getFatalLevel(), logObject, e); };
+        Logger.prototype.trace = async function (logObject) { return await this.log(getTraceLevel(), logObject); };
+        Logger.prototype.debug = async function (logObject) { return await this.log(getDebugLevel(), logObject); };
+        Logger.prototype.info = async function (logObject) { return await this.log(getInfoLevel(), logObject); };
+        Logger.prototype.warn = async function (logObject) { return await this.log(getWarnLevel(), logObject); };
+        Logger.prototype.error = async function (logObject) { return await this.log(getErrorLevel(), logObject); };
+        Logger.prototype.fatal = async function (logObject) { return await this.log(getFatalLevel(), logObject); };
+        Logger.prototype.fatalException = async function (logObject, e) { return await this.log(getFatalLevel(), logObject, e); };
         return Logger;
     }());
     JL.Logger = Logger;
