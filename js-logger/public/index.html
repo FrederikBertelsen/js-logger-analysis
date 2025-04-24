@@ -82,35 +82,27 @@
 
             // 100K LOOP
             for (var i = 0; i < 100000; i++) {
-                
+                // Generate random log text
                 logText = "";
-            if (bigLog) {
-                for (var j = 0; j < 5000; j++) {
+                var stringLength = bigLog ? 5000 : 100;
+                for (var j = 0; j < stringLength; j++) {
                     // Generate random character code in the printable ASCII range (32-126)
                     const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
                     logText += String.fromCharCode(randomCharCode);
                 }
-            } else {
-                for (var j = 0; j < 100; j++) {
-                    // Generate random character code in the printable ASCII range (32-126)
-                    const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
-                    logText += String.fromCharCode(randomCharCode);
-                }
-            }
 
-            payloadString = JSON.stringify({
-                sessionId: window.getSessionId(),
-                time: new Date().toISOString(),
-                level: "info",
-                text: logText
-            });
+                payloadString = JSON.stringify({
+                    sessionId: window.getSessionId(),
+                    time: new Date().toISOString(),
+                    level: "info",
+                    text: logText
+                });
 
                 //await new Promise(resolve => setTimeout(resolve, sleepTime));
 
                 startTime = performance.now()
 
                 // ### SEND LOGS ###
-
 
                 console.log(logText);
 
