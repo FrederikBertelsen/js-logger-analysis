@@ -429,21 +429,26 @@ class churchillLoggerAdapter extends BaseLoggerAdapter {
         // Import churchill only when needed
         this.churchill = require('churchill-logger/dist');
 
+
         const config = {
-            level: options.level || 'info'
+            level: options.level || 'info',
+            transports: [
+                new this.churchill.transports.Console(),
+                new this.churchill.transports.File(),
+            ]
         };
 
-        this.instance = new this.churchill.create(config);
+        this.instance = this.churchill.create(config);
     }
 
-    log(level, ...args) {
+    log(level, args) {
         let payload = {
             level,
             ...args
         };
-        payload.message = payload.data;
-        delete payload.data;
-        console.log(payload);
+        // payload.message = payload.data;
+        // delete payload.data;
+        // console.log(payload);
         return this.instance.processLog(payload);
     }
 
