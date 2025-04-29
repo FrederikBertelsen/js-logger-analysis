@@ -135,6 +135,18 @@
             window.running = false;
         }
         // set listeners for button clicks
+        document.getElementById('btn-click').addEventListener('click', () => {
+            fetch('/api/event', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: window.getSessionId(),
+                    time: new Date().toISOString(),
+                    level: "info",
+                    text: "TEST LOG"
+                })
+            }).catch(err => console.error('Error sending event:', err));
+        });
         document.getElementById('btn-click-loop').addEventListener('click', () => {
             send100kLogs(false);
         });

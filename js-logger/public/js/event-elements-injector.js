@@ -7,6 +7,9 @@
         <p>Interact with these elements to send events to the server.</p>
 
         <div class="form-group">
+            <button id="btn-click">Send a log</button>
+        </div>
+        <div class="form-group">
             <button id="btn-click-loop">Send 100.000 small logs</button>
         </div>
         <div class="form-group">

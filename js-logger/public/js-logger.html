@@ -136,6 +136,9 @@
             window.running = false;
         }
         // set listeners for button clicks
+        document.getElementById('btn-click').addEventListener('click', () => {
+            Logger.info("TEST LOG");
+        });
         document.getElementById('btn-click-loop').addEventListener('click', () => {
             send100kLogs(false);
         });
