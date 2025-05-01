@@ -93,19 +93,23 @@ const server = http.createServer((req, res) => {
     else if (req.method === 'POST' && req.url === '/api/event') {
         utils.getJsonOrStringFromRequest(req).then((json) => {
             // console.log("Raw data received:", json);
+            var startedAt = performance.now();
             const processLogEntry = (log) => {
+
                 if (log.level) {
                     const level = log.level;
                     delete log.level;
 
-                    const startedAt = performance.now();
+                    startedAt = performance.now();
                     logger.log(level.toLowerCase(), log);
                     const finishedAt = performance.now();
+
+
 
                     const duration = finishedAt - startedAt;
                     logDurations.push(duration);
                 } else {
-                    const startedAt = performance.now();
+                    startedAt = performance.now();
                     logger.log(log);
                     const finishedAt = performance.now();
 
@@ -126,6 +130,13 @@ const server = http.createServer((req, res) => {
 
             res.writeHead(200);
             res.end();
+            fs.appendFile(path.join('serverStartTimes.txt'),startedAt.toString() + '\n', (err) => {
+                if (err) {
+                    console.error('Error writing to log durations file:', err);
+                } else {
+                    console.log(`${logDurations.length} log durations appended to ${LOG_FILE_PATH}`);
+                }
+            });
         }).catch((error) => {
             console.log("Error happend: ", error);
             res.writeHead(400, { 'Content-Type': 'text/plain' });
