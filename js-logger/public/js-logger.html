@@ -30,6 +30,7 @@
         </div>
         `;
         var times = []
+        var startIndex = []
         var startTime = performance.now()
         var endTime = performance.now()
 
@@ -37,7 +38,9 @@
         document.getElementById('download-button').addEventListener('click', () => {
             if (times.length >= 0) {
                 downloadTextFile(times.toString(), 'js-logger-log-times.txt');
+                downloadTextFile(startIndex.toString(), 'js-logger-startTimes.txt')
                 times = []
+                startIndex = []
             }
         });
 
@@ -117,6 +120,7 @@
 
                 endTime = performance.now();
                 times.push(endTime - startTime)
+                startIndex.push(startTime)
             }
 
             const testEndTime = performance.now();

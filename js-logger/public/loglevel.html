@@ -31,6 +31,7 @@
             <button id="download-button">Download</button>
         </div>
         `;
+        var startIndex = []
         var times = []
         var startTime = performance.now()
         var endTime = performance.now()
@@ -39,7 +40,9 @@
         document.getElementById('download-button').addEventListener('click', () => {
             if (times.length >= 0) {
                 downloadTextFile(times.toString(), 'loglevel-log-times.txt');
+                downloadTextFile(startIndex.toString(), 'loglevel-startTimes.txt')
                 times = []
+                startIndex = []
             }
         });
 
@@ -126,6 +129,7 @@
 
                 endTime = performance.now();
                 times.push(endTime - startTime)
+                startIndex.push(startTime)
             }
 
             const testEndTime = performance.now();
