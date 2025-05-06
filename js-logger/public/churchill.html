@@ -30,7 +30,7 @@
             <button id="download-button">Download</button>
         </div>
         `;
-        var startIndex = []
+        var startTimes = []
         var times = []
         var startTime = performance.now()
         var endTime = performance.now()
@@ -39,9 +39,9 @@
         document.getElementById('download-button').addEventListener('click', () => {
             if (times.length >= 0) {
                 downloadTextFile(times.toString(), 'churchill-log-times.txt');
-                downloadTextFile(startIndex.toString(), 'churchill-startTimes.txt')
+                downloadTextFile(startTimes.toString(), 'churchill-startTimes.txt')
                 times = []
-                startIndex = []
+                startTimes = []
             }
         });
         const logger = Churchill.create();
@@ -103,7 +103,7 @@
                 // #################
 
                 endTime = performance.now();
-                startTime.push(startTime)
+                startTimes.push(startTime)
                 times.push(endTime - startTime)
             }
 
