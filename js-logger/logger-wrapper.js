@@ -442,10 +442,29 @@ class churchillLoggerAdapter extends BaseLoggerAdapter {
     }
 
     log(level, args) {
-        let payload = {
-            level,
-            ...args
-        };
+        let payload = {}
+        if (args.data) {
+
+            payload = {
+                level,
+                ...args
+            };
+        } else {
+            let message = '';
+            if (args.message) {
+                message = args.message;
+                delete args.message;
+            } else if (args.text) {
+                message = args.text;
+                delete args.text;
+            }
+
+            payload = {
+                level,
+                data: { message: message },
+                metadata: args,
+            };
+        }
         // payload.message = payload.data;
         // delete payload.data;
         // console.log(payload);
