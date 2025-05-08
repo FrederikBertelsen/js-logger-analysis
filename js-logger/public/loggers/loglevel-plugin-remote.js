@@ -285,7 +285,7 @@
 
             var queue = new Queue(config.capacity);
 
-            async function send() {
+            function send() {
                 if (isSuspended || isSending || config.token === undefined) {
                     return;
                 }
@@ -303,7 +303,7 @@
                 isSending = true;
 
                 var xhr = new win.XMLHttpRequest();
-                xhr.open(config.method, config.url, false);
+                xhr.open(config.method, config.url, true);
                 xhr.setRequestHeader('Content-Type', contentType);
                 if (config.token) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + config.token);
@@ -343,49 +343,31 @@
                     }, config.timeout);
                 }
 
-                // xhr.onreadystatechange = function () {
-                //     if (xhr.readyState !== 4) {
-                //         return;
-                //     }
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState !== 4) {
+                        return;
+                    }
 
-                //     isSending = false;
-                //     win.clearTimeout(timeout);
+                    isSending = false;
+                    win.clearTimeout(timeout);
 
-                //     if (xhr.status === 200) {
-                //         // eslint-disable-next-line prefer-destructuring
-                //         interval = config.interval;
-                //         queue.confirm();
-                //         suspend(true);
-                //     } else {
-                //         if (xhr.status === 401) {
-                //             var token = config.token;
+                    if (xhr.status === 200) {
+                        // eslint-disable-next-line prefer-destructuring
+                        interval = config.interval;
+                        queue.confirm();
+                        suspend(true);
+                    } else {
+                        if (xhr.status === 401) {
+                            var token = config.token;
 
-                //             config.token = undefined;
-                //             config.onUnauthorized(token);
-                //         }
-                //         suspend();
-                //     }
-                // };
+                            config.token = undefined;
+                            config.onUnauthorized(token);
+                        }
+                        suspend();
+                    }
+                };
 
                 xhr.send(queue.content);
-
-                isSending = false;
-                win.clearTimeout(timeout);
-
-                if (xhr.status === 200) {
-                    // eslint-disable-next-line prefer-destructuring
-                    interval = config.interval;
-                    queue.confirm();
-                    // suspend(true);
-                } else {
-                    if (xhr.status === 401) {
-                        var token = config.token;
-
-                        config.token = undefined;
-                        config.onUnauthorized(token);
-                    }
-                    suspend();
-                }
             }
 
             originalFactory = logger.methodFactory;
@@ -398,7 +380,7 @@
                 var levelVal = loglevel.levels[methodName.toUpperCase()];
                 var needLog = levelVal >= loglevel.levels[config.level.toUpperCase()];
 
-                return async function () {
+                return function () {
                     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
                         args[_key] = arguments[_key];
                     }
@@ -451,7 +433,7 @@
                         }
 
                         queue.push(content);
-                        await send();
+                        send();
                     }
 
                     rawMethod.apply(undefined, args);
@@ -461,9 +443,9 @@
             logger.methodFactory = pluginFactory;
             logger.setLevel(logger.getLevel());
 
-            remote.setToken = async function (token) {
+            remote.setToken = function (token) {
                 config.token = token;
-                await send();
+                send();
             };
 
             return logger;
