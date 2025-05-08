@@ -33,10 +33,10 @@
         var times = []
         var startTime = performance.now()
         var endTime = performance.now()
-        
+
         document.body.prepend(container);
         document.getElementById('download-button').addEventListener('click', () => {
-            if (times.length >= 0){
+            if (times.length >= 0) {
                 downloadTextFile(times.toString(), 'jsnlog-log-times.txt');
                 downloadTextFile(startIndex.toString(), 'jsnlog-startTimes.txt')
                 times = []
@@ -46,8 +46,16 @@
         const ajaxAppender = JL.createAjaxAppender("CustomAppender");
         ajaxAppender.setOptions({
             url: "/api/event",  // Your custom endpoint
+
+            // Batching settings
+            batchSize: 10,         // Number of logs to collect before sending (default: 1)
+            bufferSize: 10,        // Size of buffer for lower priority logs (default: 0)
+            maxBatchSize: 10,     // Maximum batch size (default: 20)
+            // batchTimeout: 5000,    // Send batch after this many ms, even if not full (default: 2147483647)
+
+            // Buffer settings
             storeInBufferLevel: JL.getDebugLevel(), // Ensures logs are stored
-            sendWithBufferLevel: 1000, // Ensures logs are sent immediately
+            // sendWithBufferLevel: 1000, // Ensures logs are sent immediately
         });
 
         const consoleAppender = JL.createConsoleAppender("ConsoleAppender");
