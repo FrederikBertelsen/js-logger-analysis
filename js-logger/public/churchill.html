@@ -70,7 +70,7 @@
         //     times.push(endTime-startTime)
         // }
 
-        async function send100kLogs(bigLog = false) {
+        function send100kLogs(bigLog = false) {
             if (window.running && window.running === true) {
                 console.log("Already running!");
                 return;
@@ -98,7 +98,7 @@
 
                 // ### SEND LOGS ###
 
-                await logger.info(logText);
+                logger.info(logText);
 
                 // #################
 

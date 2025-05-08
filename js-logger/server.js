@@ -110,7 +110,7 @@ const server = http.createServer((req, res) => {
                     logDurations.push(duration);
                 } else {
                     startedAt = performance.now();
-                    logger.log(log);
+                    logger.log('info', log);
                     const finishedAt = performance.now();
 
                     const duration = finishedAt - startedAt;

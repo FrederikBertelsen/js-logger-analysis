@@ -18,6 +18,11 @@ var _createClass = function () {
 // Runtime type checking to ensure proper instantiation with 'new' keyword
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var _batch = []
+var _batchSize = 10; // Number of logs to send in a single batch
+var _batchTimeout = 10; // Time in milliseconds to wait before sending the batch
+
+
 // Log level priority mapping - lower values indicate higher priority
 var _dict = {
     "error": 10,  // Highest priority - critical failures requiring immediate attention
@@ -35,6 +40,7 @@ var Churchill = function () {
         this.serverUrl = undefined; // Remote server URL, undefined means no remote logging
         this.level = 'info';        // Default log threshold - only info and higher priority will be logged
         this.useragent = false;     // By default, don't add user agent to logs
+        this.batchInterval = undefined; // Interval for sending batched logs
     }
 
     // Dynamically generates logging methods (error, warn, info, debug, trace)
@@ -43,7 +49,7 @@ var Churchill = function () {
         Object.keys(_dict).map(function (level) {
             _levelFunctions.push({
                 key: level.toString(),
-                value: async function (data = "") {
+                value: function (data = "") {
                     // Only process logs at or above the configured threshold level
                     if (_dict[level] <= _dict[this.level]) {
                         // if data is a string, put it in an object with key 'message'
@@ -88,7 +94,11 @@ var Churchill = function () {
 
                         // Send logs immediately if server logging is configured
                         if (this.serverUrl !== undefined) {
-                            await _sendLog(this.serverUrl, payload);
+                            _batch.push(payload);
+                            if (_batch.length > _batchSize) {
+                                _sendLog(this.serverUrl, _batch);
+                                _batch = []
+                            }
                         }
                     }
                 }
@@ -97,35 +107,27 @@ var Churchill = function () {
         return _levelFunctions
     }
 
-    // Transmits log to the configured server url and awaits response
-    // Uses XMLHttpRequest with Promise for async/await compatibility
-    async function _sendLog(serverUrl, payload) {
-        return new Promise((resolve, reject) => {
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", serverUrl, false); // Asynchronous POST request
-            xhr.setRequestHeader("Content-Type", "application/json");
+    // Transmits log to the configured server url
+    // Uses XMLHttpRequest for broader browser compatibility
+    function _sendLog(serverUrl, payload) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", serverUrl, false); // Asynchronous POST request
+        xhr.setRequestHeader("Content-Type", "application/json");
 
-            // Handle HTTP status errors (4xx, 5xx) and success
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status >= 400) {
-                        console.error('Failed to send log:', xhr.statusText);
-                        reject(xhr.statusText);
-                    } else if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(xhr.response);
-                    }
-                }
-            };
+        // Handle HTTP status errors (4xx, 5xx)
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status >= 400) {
+                console.error('Failed to send log:', xhr.statusText);
+            }
+        };
 
-            // Handle network-level errors (connection refused, timeout, etc.)
-            xhr.onerror = function () {
-                console.error('Failed to send log: Network error');
-                reject('Network error');
-            };
+        // Handle network-level errors (connection refused, timeout, etc.)
+        xhr.onerror = function () {
+            console.error('Failed to send log: Network error');
+        };
 
-            // Send log data as JSON string
-            xhr.send(JSON.stringify(payload));
-        });
+        // Send log data as JSON string
+        xhr.send(JSON.stringify(payload));
     }
 
     _createClass(Churchill,
@@ -147,6 +149,23 @@ var Churchill = function () {
                         // Configure server URL for remote logging
                         if (options.serverUrl !== undefined) {
                             this.serverUrl = options.serverUrl;
+                            if (this.batchInterval == undefined) {
+                                this.batchInterval = setInterval(() => {
+                                    if (_batch.length > 0) {
+                                        _sendLog(this.serverUrl, _batch);
+                                        _batch = []
+                                    }
+                                }, _batchTimeout);
+                            } else {
+                                clearInterval(this.batchInterval);
+                                this.batchInterval = undefined;
+                                if (_batch.length > 0) {
+                                    this.batchInterval = setInterval(() => {
+                                        _sendLog(this.serverUrl, _batch);
+                                        _batch = [];
+                                    }, _batchTimeout);
+                                }
+                            }
                         }
 
                         if (options.level !== undefined) {
