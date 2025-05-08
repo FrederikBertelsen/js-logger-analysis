@@ -285,7 +285,7 @@
 
             var queue = new Queue(config.capacity);
 
-            function send() {
+            async function send() {
                 if (isSuspended || isSending || config.token === undefined) {
                     return;
                 }
@@ -303,7 +303,7 @@
                 isSending = true;
 
                 var xhr = new win.XMLHttpRequest();
-                xhr.open(config.method, config.url, true);
+                xhr.open(config.method, config.url, false);
                 xhr.setRequestHeader('Content-Type', contentType);
                 if (config.token) {
                     xhr.setRequestHeader('Authorization', 'Bearer ' + config.token);
@@ -320,7 +320,7 @@
                     }
                 }
 
-                function suspend(successful) {
+                async function suspend(successful) {
                     if (!successful) {
                         // interval = config.backoff(interval || 1);
                         interval = backoffFunc(interval || 1);
@@ -328,22 +328,22 @@
                     }
 
                     isSuspended = true;
-                    win.setTimeout(function () {
+                    win.setTimeout(async function () {
                         isSuspended = false;
-                        send();
+                        await send();
                     }, interval);
                 }
 
                 var timeout = void 0;
                 if (config.timeout) {
-                    timeout = win.setTimeout(function () {
+                    timeout = win.setTimeout(async function () {
                         isSending = false;
                         xhr.abort();
-                        suspend();
+                        await suspend();
                     }, config.timeout);
                 }
 
-                xhr.onreadystatechange = function () {
+                xhr.onreadystatechange = async function () {
                     if (xhr.readyState !== 4) {
                         return;
                     }
@@ -355,7 +355,7 @@
                         // eslint-disable-next-line prefer-destructuring
                         interval = config.interval;
                         queue.confirm();
-                        suspend(true);
+                        await suspend(true);
                     } else {
                         if (xhr.status === 401) {
                             var token = config.token;
@@ -363,11 +363,11 @@
                             config.token = undefined;
                             config.onUnauthorized(token);
                         }
-                        suspend();
+                        await suspend();
                     }
                 };
 
-                xhr.send(queue.content);
+                await xhr.send(queue.content);
             }
 
             originalFactory = logger.methodFactory;
@@ -380,7 +380,7 @@
                 var levelVal = loglevel.levels[methodName.toUpperCase()];
                 var needLog = levelVal >= loglevel.levels[config.level.toUpperCase()];
 
-                return function () {
+                return async function () {
                     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
                         args[_key] = arguments[_key];
                     }
@@ -433,7 +433,7 @@
                         }
 
                         queue.push(content);
-                        send();
+                        await send();
                     }
 
                     rawMethod.apply(undefined, args);
@@ -443,9 +443,9 @@
             logger.methodFactory = pluginFactory;
             logger.setLevel(logger.getLevel());
 
-            remote.setToken = function (token) {
+            remote.setToken = async function (token) {
                 config.token = token;
-                send();
+                await send();
             };
 
             return logger;
