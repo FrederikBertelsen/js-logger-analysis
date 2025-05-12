@@ -70,7 +70,7 @@
         //     times.push(endTime-startTime)
         // }
 
-        function send100kLogs(bigLog = false) {
+        async function send100kLogs(bigLog = false) {
             if (window.running && window.running === true) {
                 console.log("Already running!");
                 return;
@@ -92,6 +92,11 @@
                     // Generate random character code in the printable ASCII range (32-126)
                     const randomCharCode = Math.floor(Math.random() * (126 - 32 + 1)) + 32;
                     logText += String.fromCharCode(randomCharCode);
+                }
+
+
+                if (i%10 === 0){
+                    await new Promise(resolve => setTimeout(resolve, 10));
                 }
 
                 startTime = performance.now()
