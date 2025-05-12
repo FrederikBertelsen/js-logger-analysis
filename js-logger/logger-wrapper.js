@@ -378,7 +378,7 @@ class tslogLoggerAdapter extends BaseLoggerAdapter {
         super(options);
         // Import pino only when needed
         this.tslog = require('tslog');
-        this.appendFileSync = require('fs').appendFileSync;
+        this.appendFile = require('fs').appendFile;
 
         const config = {
             level: options.level || 'info'
@@ -400,7 +400,7 @@ class tslogLoggerAdapter extends BaseLoggerAdapter {
         this.instance = new this.tslog.Logger();
 
         this.instance.attachTransport((logObj) => {
-            this.appendFileSync("logs/tslog/logs.txt", JSON.stringify(logObj) + "\n");
+            this.appendFile("logs/tslog/logs.txt", JSON.stringify(logObj) + "\n");
         });
     }
 
