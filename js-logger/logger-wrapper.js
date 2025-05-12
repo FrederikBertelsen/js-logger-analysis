@@ -400,7 +400,9 @@ class tslogLoggerAdapter extends BaseLoggerAdapter {
         this.instance = new this.tslog.Logger();
 
         this.instance.attachTransport((logObj) => {
-            this.appendFile("logs/tslog/logs.txt", JSON.stringify(logObj) + "\n");
+            this.appendFile("logs/tslog/logs.txt", JSON.stringify(logObj) + "\n", (err) => {
+                if (err) console.error('Failed to write tslog log:', err);
+            });
         });
     }
 
