@@ -220,7 +220,7 @@
         token: '',
         onUnauthorized: function onUnauthorized() { },
         timeout: 0,
-        interval: 1000,
+        interval: 100000000000000,
         level: 'trace',
         backoff: {
             multiplier: 2,

@@ -20,7 +20,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var _batch = []
 var _batchSize = 10; // Number of logs to send in a single batch
-var _batchTimeout = 10; // Time in milliseconds to wait before sending the batch
+var _batchTimeout = 10000000000000; // Time in milliseconds to wait before sending the batch
 
 
 // Log level priority mapping - lower values indicate higher priority
